@@ -1,0 +1,1088 @@
+/*
+ * DLF site styles — design tokens + component patterns captured live from
+ * dalailamafellows.com (2026-07-17), NOT the rejected fellows-landing.html
+ * mockup. See docs/MIGRATION-PLAN.md §3 and memory dlf-ui-fidelity-preference.
+ *
+ * Fonts: Futura PT (titles) / Proxima Nova (body) — the real Adobe Fonts kit
+ * (Than's Creative Cloud account, enqueued in functions.php), same as the
+ * live site, not a substitute.
+ *
+ * ---------------------------------------------------------------------------
+ * QUICK INDEX — search for the "---- Name ----" banner to jump to a section.
+ * Each entry also lists which template(s)/page(s) actually render it, so you
+ * can go straight to the right block instead of reading the whole file.
+ * ---------------------------------------------------------------------------
+ *   Design tokens (:root)          design vars used everywhere below
+ *   Base element resets            *, body, strong/b, h1-h4, a, img (all pages)
+ *   Site header / nav              parts/header.php (every page)
+ *   Plain page fallback wrapper    page.php (the 6 static content pages)
+ *   Footer                         parts/footer.php (every page)
+ *   Homepage hero                  front-page.php chrome (title/image from
+ *                                    the "Reimagine Leadership" Page, see below)
+ *   Mission section                Homepage ("Reimagine Leadership" Page)
+ *                                    post_content only
+ *   Full-bleed content photo       Homepage post_content only (add class
+ *                                    dlf-content-photo--parallax for drift)
+ *   Pull-quote                     Homepage post_content only
+ *   Outlined pill button           Homepage post_content ("Our Approach" button)
+ *   Fellows archive + modal        archive-fellow.php, taxonomy.php
+ *   Single-fellow profile page     single-fellow.php
+ *   Plain content page typography  page.php post_content (h2/h3/p/ul/etc.)
+ *   Mid-page full-bleed section    page.php post_content, e.g. About's
+ *     hero + parallax                "Our Origin" (see docs/full-width-
+ *                                    parallax-hero.md for the full mechanics)
+ *   Core-values icon row           About page post_content only
+ *   Team / community-fellow grid   About page post_content only
+ *   Page photo figure              any page.php post_content with an <img>
+ *   External links row             page.php post_content (e.g. Apply page)
+ *   FAQ accordion                  Apply page post_content only
+ *   Mobile breakpoint (700px)      overrides for several sections above
+ * ---------------------------------------------------------------------------
+ */
+
+/* ---- Design tokens ---- */
+/* Central place for colors/fonts/spacing reused across every section below.
+   Change a value here to re-theme the whole site at once. */
+:root {
+	--dlf-font-heading: futura-pt, sans-serif;
+	--dlf-font-body: proxima-nova, sans-serif;
+	--dlf-text: #363636;
+	--dlf-heading-color: #16161d;
+	--dlf-muted: #767676;
+	--dlf-bg: #ffffff;
+	--dlf-rule: #e2e2e2;
+	--dlf-max-width: 1100px;
+}
+
+/* ---- Base element resets ---- */
+/* Applies everywhere; edit with care since these cascade into every section
+   below (most sections only override the specific parts that need to differ
+   from these defaults). */
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	overflow-x: hidden; /* 100vw full-bleed breakouts (.dlf-section-hero) can be a hair wider than the viewport on some scrollbar configs */
+	font-family: var(--dlf-font-body);
+	font-weight: 300; /* body copy is intentionally light -- matches the live site */
+	font-size: 18px;
+	line-height: 1.8;
+	color: var(--dlf-text);
+	background: var(--dlf-bg);
+}
+
+/* The UA default `strong{font-weight:bolder}` resolves relative to the
+   inherited weight, and CSS's bolder-mapping table sends 300 -> 400, not
+   700 -- so inline <strong> in body copy (weight 300) renders barely
+   distinguishable from regular text unless pinned explicitly. */
+strong, b {
+	font-weight: 700;
+}
+
+/* Headings default to Futura PT bold everywhere; individual sections below
+   override text-transform/size/etc. per component as needed. */
+h1, h2, h3, h4 {
+	font-family: var(--dlf-font-heading);
+	font-weight: 700;
+	color: var(--dlf-heading-color);
+	line-height: 1.2;
+}
+
+h2 {
+	text-align: center;
+	text-transform: uppercase;
+}
+
+a {
+	color: inherit;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+/* ---- Site header / nav ---- */
+/* parts/header.php, included on every page. Two visual modes: normal
+   (opaque, dark text) and overlaid-on-hero (transparent, white text via
+   .dlf-hero .dlf-site-header below) -- the latter is used whenever a page
+   has a full-bleed photo hero behind the header (homepage + all static
+   pages via page.php). */
+
+.dlf-site-header {
+	position: relative;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2rem;
+	padding: 1.25rem 2rem;
+	color: var(--dlf-header-fg, var(--dlf-heading-color));
+}
+
+/* "DALAI LAMA FELLOWS" wordmark, top-left of every page. */
+.dlf-site-header__logo {
+	font-family: var(--dlf-font-heading);
+	font-weight: 700;
+	font-size: 1.375rem; /* 22px -- matches live site's header wordmark */
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: inherit;
+}
+
+/* Top-right nav: About / The Fellowship / Apply / Meet the Fellows / Donate / Contact Us */
+.dlf-site-header__menu {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.75rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.dlf-site-header__menu a {
+	font-family: var(--dlf-font-body);
+	font-size: 0.8125rem; /* 13px -- matches live site's nav links */
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: inherit;
+}
+
+.dlf-site-header__menu a:hover {
+	text-decoration: underline;
+}
+
+/* Current page's nav link stays underlined, matching the live site.
+   `.current-menu-item` is added automatically by wp_nav_menu() (WordPress
+   compares each menu item's URL against the current request) -- no
+   per-page template logic needed here. */
+.dlf-site-header__menu .current-menu-item > a {
+	text-decoration: underline;
+}
+
+/* Overlaid transparent on a hero photo, white text (matches the live site) */
+.dlf-hero .dlf-site-header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	--dlf-header-fg: #fff;
+}
+
+/* ---- Plain page fallback wrapper ---- */
+/* page.php: the max-width column that all 6 static pages' post_content
+   renders inside, below their photo hero. Typography for what's inside
+   this wrapper is defined further down in "Plain content page typography". */
+
+.dlf-plain-page__inner {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 4rem 1.5rem 6rem;
+}
+
+/* ---- Footer ---- */
+/* parts/footer.php, included on every page: "back to top" link, social
+   icons, a 2-column link list, and partner-logo strip. */
+
+.dlf-site-footer {
+	text-align: center;
+	padding: 3rem 1.5rem 4rem;
+}
+
+.dlf-footer-top {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.15rem;
+	font-size: 0.7rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: var(--dlf-text);
+	margin-bottom: 2rem;
+}
+
+.dlf-footer-top__chevron {
+	font-size: 1.1rem;
+}
+
+.dlf-footer-social {
+	display: flex;
+	justify-content: center;
+	gap: 1.25rem;
+	margin-bottom: 2rem;
+}
+
+.dlf-footer-social a {
+	color: var(--dlf-heading-color);
+}
+
+.dlf-footer-rule {
+	max-width: var(--dlf-max-width);
+	margin: 0 auto 2.5rem;
+	border: none;
+	border-top: 1px solid var(--dlf-rule);
+}
+
+.dlf-footer-columns {
+	max-width: var(--dlf-max-width);
+	margin: 0 auto 3rem;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(180px, 260px));
+	gap: 2.5rem;
+	text-align: left;
+}
+
+.dlf-footer-col strong {
+	display: block;
+	font-family: var(--dlf-font-body);
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--dlf-heading-color);
+	margin-bottom: 0.75rem;
+}
+
+.dlf-footer-col ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.dlf-footer-col li {
+	margin-bottom: 0.4rem;
+}
+
+.dlf-footer-col a {
+	font-size: 1rem;
+	text-decoration: underline;
+	color: var(--dlf-text);
+}
+
+.dlf-footer-logos {
+	display: flex;
+	justify-content: center;
+}
+
+.dlf-footer-logos img {
+	max-width: 400px;
+	width: 100%;
+	height: auto;
+}
+
+/* ---- Homepage hero (accessible sticky + scroll-driven drift, Spike E) ---- */
+/* front-page.php's chrome around the editable "Reimagine Leadership" Page
+   (Settings > Reading > homepage) -- the hero title and image come from
+   that Page's title/featured image, everything below the hero is that
+   Page's own post_content (see the Mission/Full-bleed-photo/Pull-quote
+   sections further down). Full-viewport sticky photo hero that stays
+   pinned while the page scrolls, then releases as the content panel rides
+   up over it. See docs/full-width-parallax-hero.md for the full
+   explanation of how this differs from the mid-page ".dlf-section-hero"
+   pattern further down. */
+
+/* Bounds the sticky hero's "stuck" range to exactly hero+panel's own height,
+   so it releases cleanly right as the panel ends instead of staying stuck
+   (and peeking through) into whatever comes after — see front-page.php. */
+.dlf-hero-scroll {
+	position: relative;
+}
+
+.dlf-hero {
+	position: relative;
+	z-index: 0;
+	overflow: hidden;
+	background: #222;
+	display: grid;
+	place-items: center;
+	text-align: center;
+}
+
+/* Full-height sticky hero with scroll-driven drift — homepage only. */
+.dlf-hero--home {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+}
+
+/* Short static banner — fellows archive / single-fellow pages. */
+.dlf-hero--page {
+	height: 320px;
+}
+
+.dlf-hero__img {
+	position: absolute;
+	inset: 0; /* top: 0 -- box is top-aligned at rest, all 18% overflow hangs below (see the drift keyframes for why) */
+	width: 100%;
+	height: 118%; /* headroom for the drift animation below, so it never exposes an empty edge */
+	object-fit: cover;
+	z-index: -1;
+}
+
+.dlf-hero::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.2) 45%, rgba(0,0,0,.45));
+	pointer-events: none;
+}
+
+/* Big uppercase page/post title overlaid on the hero photo (e.g. "REIMAGINE
+   LEADERSHIP" on the homepage, or each static page's own title). */
+.dlf-hero__title {
+	position: relative;
+	color: #fff;
+	font-family: var(--dlf-font-heading);
+	font-weight: 700;
+	text-transform: uppercase;
+	/* 3.0625rem (49px) matches the live site's page-title hero text at
+	   desktop widths; scales down via vw on narrow viewports since the live
+	   site's own mobile behavior wasn't captured/reproduced 1:1 here. */
+	font-size: clamp(1.75rem, 3.2vw, 3.0625rem);
+	letter-spacing: normal;
+	white-space: nowrap;
+	line-height: 1.1;
+	margin: 0;
+	text-shadow: 0 2px 20px rgba(0,0,0,.5);
+}
+
+.dlf-hero__cue {
+	position: absolute;
+	bottom: 1.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fff;
+	font-size: 1.6rem;
+	opacity: 0.85;
+}
+
+/* Drift animation for .dlf-hero--home only, tied to root scroll position
+   since this hero always starts at scroll offset 0 (see docs/full-width-
+   parallax-hero.md for why the mid-page section-hero can't use this same
+   `scroll(root)` approach).
+
+   Starts at translateY(0) -- with .dlf-hero__img now top-aligned at rest
+   (see its own rule above), this shows the true top edge of the
+   object-fit: cover crop, no cropping and no gap, on initial load. Ends at
+   translateY(-14.5%) to reveal more of the bottom as you scroll away.
+
+   Gotcha: `translateY(%)` and `top: %` do NOT share a reference frame --
+   `top` resolves against the *containing block* (.dlf-hero, 100% height),
+   but `transform: translateY(%)` resolves against the *element's own*
+   border box (.dlf-hero__img, 118% height). An earlier version of this
+   rule paired a static `top: -9%` with `translateY(9%)`, assuming those
+   would cancel out; they don't (9% of 118%-height != 9% of 100%-height),
+   so the drift overshot and exposed .dlf-hero's #222 background as a
+   visible gap at the top of the hero, shrinking away as the animation
+   progressed back toward 0. Keeping the base position at a plain `top: 0`
+   and doing 100% of the movement through one `transform`, in one
+   reference frame, avoids the mismatch entirely -- -14.5% here is safely
+   inside the box's 18%-of-container overflow budget (calc: 18% container
+   / 1.18 box-height-ratio ≈ 15.25% max; -14.5% leaves a small margin). */
+@supports (animation-timeline: scroll()) {
+	@keyframes dlf-hero-drift {
+		from { transform: translateY(0); }
+		to   { transform: translateY(-14.5%); }
+	}
+	.dlf-hero--home .dlf-hero__img {
+		animation: dlf-hero-drift linear both;
+		animation-timeline: scroll(root);
+		animation-range: 0 100vh;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dlf-hero--home .dlf-hero__img {
+		animation: none;
+		transform: none; /* base top:0 + no transform = the same top-aligned, uncropped rest position as the animation's `from` */
+	}
+}
+
+/* Content panel rides up over the sticky hero */
+.dlf-front-panel {
+	position: relative;
+	z-index: 1;
+	background: var(--dlf-bg);
+	box-shadow: 0 -30px 60px rgba(0,0,0,.15);
+}
+
+/* ---- Mission section ---- */
+/* Homepage post_content only ("Reimagine Leadership" Page, wp-admin
+   editable): the centered "mission statement" paragraph block directly
+   below the homepage hero. */
+
+.dlf-mission {
+	padding: 5rem 1.5rem;
+}
+
+.dlf-mission__inner {
+	max-width: 760px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.dlf-mission__inner h2 {
+	font-size: 1.5rem;
+	margin-bottom: 2rem;
+}
+
+.dlf-mission__inner p {
+	text-align: left;
+	margin: 0 0 1.25rem;
+}
+
+/* ---- Full-bleed content photo ---- */
+/* Homepage post_content only: a plain full-width photo band used between
+   homepage sections (not to be confused with the parallax
+   ".dlf-section-hero" or the homepage's own sticky ".dlf-hero" -- this one
+   is static, no title overlay). Works full-bleed here because
+   front-page.php renders post_content directly inside .dlf-front-panel,
+   deliberately NOT wrapped in the width-constrained
+   .dlf-plain-page__inner the other pages use. */
+
+.dlf-content-photo img {
+	width: 100%;
+	max-height: 70vh;
+	object-fit: cover;
+}
+
+/* Opt-in scroll-driven drift for any .dlf-content-photo -- add the class
+   `dlf-content-photo--parallax` alongside `dlf-content-photo` in
+   post_content (wp-admin Custom HTML block) and it animates, no template/
+   CSS change needed for the next photo. Exact same mechanism (and the same
+   overflow:clip/percentage-reference-frame gotchas -- see the comment on
+   .dlf-section-hero above and docs/full-width-parallax-hero.md) as the
+   About page's "Our Origin" section-hero, just reused here. Unlike the
+   plain (non-parallax) rule above, this needs a *definite* height on the
+   container to absolutely-position the oversized image against, so it's
+   fixed at 70vh rather than the plain version's aspect-ratio-derived,
+   max-height-capped height. */
+.dlf-content-photo.dlf-content-photo--parallax {
+	position: relative;
+	height: 70vh;
+	overflow: clip;
+}
+
+.dlf-content-photo.dlf-content-photo--parallax img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 118%; /* headroom for the drift animation below, so it never exposes an empty edge */
+	max-height: none;
+	top: -9%;
+	object-fit: cover;
+}
+
+@supports (animation-timeline: view()) {
+	@keyframes dlf-content-photo-drift {
+		from { transform: translateY(-7%); }
+		to   { transform: translateY(7%); }
+	}
+	.dlf-content-photo.dlf-content-photo--parallax img {
+		animation: dlf-content-photo-drift linear both;
+		animation-timeline: view();
+		animation-range: cover;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dlf-content-photo.dlf-content-photo--parallax img {
+		animation: none;
+		transform: none;
+	}
+}
+
+/* ---- Pull-quote ---- */
+/* Homepage post_content only: the centered italic testimonial-style quote block. */
+
+.dlf-quote {
+	max-width: 780px;
+	margin: 0 auto;
+	padding: 4rem 1.5rem;
+	text-align: center;
+}
+
+.dlf-quote blockquote {
+	margin: 0 0 1rem;
+	font-style: italic;
+	font-size: 1.15rem;
+	line-height: 1.7;
+}
+
+.dlf-quote__attr {
+	text-align: right;
+	margin: 0 0 2.5rem;
+	color: var(--dlf-muted);
+}
+
+/* ---- Outlined pill button (matches the live site's "Our Approach" button) ---- */
+/* Homepage post_content only, but reusable in any page's post_content --
+   just add class="dlf-btn-pill" to a link. */
+
+.dlf-btn-pill {
+	display: inline-block;
+	font-family: var(--dlf-font-body);
+	font-size: 0.85rem;
+	font-weight: 400;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	text-decoration: underline;
+	color: var(--dlf-heading-color);
+	background: transparent;
+	border: 2px solid var(--dlf-heading-color);
+	border-radius: 999px;
+	padding: 1rem 2rem;
+	transition: background 0.2s, color 0.2s;
+}
+
+.dlf-btn-pill:hover {
+	background: var(--dlf-heading-color);
+	color: #fff;
+}
+
+/* ---- Fellows archive: facet bar + card grid + modal ---- */
+/* archive-fellow.php (the /fellows/ directory) and taxonomy.php (year/
+   region/country fallback listing pages). Client-side facet filtering (JS
+   fetches the custom /wp-json/dlf/v1/fellows endpoint once, filters in the
+   browser -- see mu-plugins/dlf-rest.php) plus a click-to-open modal with
+   each fellow's full bio, styled to match the live site's card-click
+   overlay. */
+
+.dlf-archive-main {
+	max-width: var(--dlf-max-width);
+	margin: 0 auto;
+	padding: 3rem 1.5rem 5rem;
+}
+
+/* "Class" / "Region" / "Country" native <select> filters above the grid */
+.dlf-facet-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2rem;
+	margin-bottom: 2.5rem;
+}
+
+.dlf-facet {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+}
+
+.dlf-facet label {
+	font-weight: 700;
+	color: var(--dlf-heading-color);
+}
+
+.dlf-facet select {
+	font-family: var(--dlf-font-body);
+	font-size: 1rem;
+	padding: 0.35rem 0.5rem;
+	border: 1px solid #999;
+	background: #fff;
+	color: var(--dlf-text);
+	min-width: 160px;
+}
+
+/* The card grid itself -- one card per fellow, headshot + name + year */
+.dlf-fellow-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 1.75rem;
+}
+
+.dlf-fellow-card {
+	display: block;
+	text-decoration: none;
+	color: var(--dlf-text);
+	cursor: pointer;
+}
+
+.dlf-fellow-card__image {
+	display: block;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	box-shadow: 0 1px 4px rgba(0,0,0,.15);
+	margin-bottom: 0.6rem;
+}
+
+.dlf-fellow-card__image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.dlf-fellow-card__name {
+	display: block;
+	font-size: 1rem;
+	font-weight: 400;
+	color: var(--dlf-heading-color);
+}
+
+.dlf-fellow-card__year {
+	display: block;
+	font-size: 0.85rem;
+	color: var(--dlf-muted);
+}
+
+.dlf-no-fellows {
+	color: var(--dlf-muted);
+}
+
+/* Modal — plain white card, matches the live site's card-click overlay.
+   Uses the native <dialog> element (::backdrop below is the native dimmed
+   background, not a hand-rolled overlay div). */
+
+.dlf-fellow-modal {
+	max-width: min(1200px, 94vw);
+	max-height: min(595px, 88vh);
+	width: 100%;
+	overflow-y: auto;
+	border: none;
+	border-radius: 4px;
+	padding: 2.5rem;
+	box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+/* The actual grid container — #dlf-fellow-modal-content is the wrapper JS
+   injects header/body into, sitting between the dialog and those elements,
+   so the grid has to live here for grid-column to apply to its children. */
+#dlf-fellow-modal-content {
+	display: grid;
+	grid-template-columns: 260px 1fr;
+	gap: 2.5rem;
+}
+
+/* Darker overlay, matching the live site's card-click modal */
+.dlf-fellow-modal::backdrop {
+	background: rgba(0,0,0,.8);
+}
+
+.dlf-fellow-modal__close {
+	position: absolute;
+	top: 1rem;
+	right: 1.25rem;
+	font-size: 1.5rem;
+	line-height: 1;
+	background: none;
+	border: none;
+	color: var(--dlf-muted);
+	cursor: pointer;
+}
+
+.dlf-fellow-modal__header {
+	grid-column: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.75rem;
+}
+
+.dlf-fellow-modal__header img {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+}
+
+.dlf-fellow-modal__body {
+	grid-column: 2;
+	min-width: 0;
+}
+
+.dlf-fellow-modal__name {
+	margin: 0 0 0.25rem;
+	font-size: 1.4rem;
+}
+
+.dlf-fellow-modal__meta {
+	margin: 0;
+	color: var(--dlf-muted);
+}
+
+/* "Leadership Vision" / "Project Description" bold labels inside the modal */
+.dlf-fellow-modal__section-label {
+	display: block;
+	font-weight: 700;
+	color: var(--dlf-heading-color);
+	margin: 1.25rem 0 0.5rem;
+}
+
+.dlf-fellow-modal__learn-more {
+	list-style: none;
+	margin: 0.5rem 0 0;
+	padding: 0;
+}
+
+.dlf-fellow-modal__learn-more a {
+	text-decoration: underline;
+}
+
+.dlf-fellow-modal__full-profile {
+	display: inline-block;
+	margin-top: 1.5rem;
+	font-weight: 700;
+	text-decoration: underline;
+}
+
+/* ---- Single-fellow profile page ---- */
+/* single-fellow.php: the canonical /fellows/<slug>/ page (in addition to
+   the archive's modal) -- full-bleed photo hero (via .dlf-hero--page above)
+   then breadcrumb chips, Leadership Vision / Project Description sections,
+   and Learn More links below. */
+
+.dlf-fellow-single {
+	max-width: 760px;
+	margin: 0 auto;
+	padding: 3rem 1.5rem 5rem;
+}
+
+.dlf-fellow-single__breadcrumb {
+	margin: 0 0 1.5rem;
+}
+
+.dlf-fellow-single__breadcrumb a {
+	text-decoration: underline;
+	color: var(--dlf-muted);
+}
+
+/* Year / region / country chip row, each chip links back to the filtered archive */
+.dlf-fellow-single__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 2.5rem;
+}
+
+.dlf-fellow-meta-chip {
+	display: inline-block;
+	font-size: 0.85rem;
+	padding: 0.3rem 0.8rem;
+	border: 1px solid var(--dlf-rule);
+	border-radius: 999px;
+	color: var(--dlf-text);
+	text-decoration: none;
+}
+
+.dlf-fellow-meta-chip:hover {
+	border-color: var(--dlf-heading-color);
+}
+
+.dlf-fellow-single__section {
+	margin-bottom: 2.5rem;
+}
+
+.dlf-fellow-single__section-label {
+	font-family: var(--dlf-font-body);
+	font-size: 1.25rem;
+	font-weight: 700;
+	text-transform: none;
+	color: var(--dlf-heading-color);
+	margin: 0 0 0.75rem;
+}
+
+.dlf-fellow-single__learn-more {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+/* ---- Plain content page typography ---- */
+/* page.php: styling for whatever comes out of the WP editor inside
+   .dlf-plain-page__inner (see that wrapper's own rule further up) on the
+   6 static pages (about, the-fellowship, apply, donate, contact-us). These
+   are generic element selectors scoped to that wrapper, so any new content
+   added through wp-admin picks up consistent styling automatically. */
+
+.dlf-plain-page__inner h2 {
+	font-size: 1.4rem;
+	text-transform: uppercase;
+	margin: 2.5rem 0 1rem;
+}
+
+.dlf-plain-page__inner h2:first-child {
+	margin-top: 0;
+}
+
+.dlf-plain-page__inner h3 {
+	font-family: var(--dlf-font-body);
+	font-size: 1.1rem;
+	text-transform: none;
+	margin: 2rem 0 0.5rem;
+}
+
+.dlf-plain-page__inner p {
+	margin: 0 0 1.25rem;
+}
+
+.dlf-plain-page__inner ul, .dlf-plain-page__inner ol {
+	margin: 0 0 1.25rem;
+	padding-left: 1.5rem;
+}
+
+.dlf-plain-page__inner li {
+	margin-bottom: 0.5rem;
+}
+
+.dlf-plain-page__inner a {
+	text-decoration: underline;
+}
+
+.dlf-plain-page__inner blockquote {
+	margin: 1.5rem 0;
+	padding-left: 1.25rem;
+	border-left: 3px solid var(--dlf-rule);
+	font-style: italic;
+	color: var(--dlf-text);
+}
+
+.dlf-plain-page__inner blockquote cite {
+	display: block;
+	margin-top: 0.5rem;
+	font-style: normal;
+	font-size: 0.9rem;
+	color: var(--dlf-muted);
+}
+
+/* ---- Mid-page full-bleed section hero + parallax ---- */
+/* Mid-page full-bleed section break with an overlaid title (e.g. About's
+   "Our Origin"). This markup lives in page.php post_content (the WP
+   database), NOT in a template file -- see docs/full-width-parallax-hero.md
+   for the full writeup of how this differs from the homepage's sticky
+   ".dlf-hero" above, including two easy-to-repeat gotchas:
+     1. the 100vw/left:50%/margin-left:-50vw full-bleed breakout trick
+        (needed here because this sits inside a centered content column;
+        the page-level hero above doesn't need it, it's already a top-level
+        sibling of that column)
+     2. why the drift below uses `view()` instead of `scroll(root)` (this
+        section can land at any scroll depth, unlike the page-level hero
+        which always starts at scroll offset 0)
+   Full 100vh to match the live site (confirmed via live inspection: its
+   "Our Origin" image band renders at exactly 100vh, not a shorter static
+   banner) -- unlike the page-level hero it's not sticky/pinned though, it
+   scrolls normally with the image itself drifting. */
+.dlf-section-hero {
+	position: relative;
+	left: 50%;
+	width: 100vw;
+	margin: 3rem 0;
+	margin-left: -50vw;
+	height: 100vh;
+	min-height: 480px;
+	display: grid;
+	place-items: center;
+	/* clip, not hidden: overflow:hidden establishes a scroll container, which
+	   the img's `view()` timeline below then picks up as its nearest ancestor
+	   scroll container instead of the document -- since that container never
+	   itself scrolls, the timeline reads a constant progress and the drift
+	   freezes. overflow:clip visually clips the same way but isn't a scroll
+	   container, so view() correctly tracks real page scroll. */
+	overflow: clip;
+}
+
+.dlf-section-hero img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 118%; /* headroom for the drift animation below, so it never exposes an empty edge */
+	top: -9%;
+	object-fit: cover;
+}
+
+.dlf-section-hero::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(0,0,0,.3), rgba(0,0,0,.35));
+}
+
+/* Deliberately an <h2>, not <h1> -- the live site marks this up as a second
+   h1.page-title (SquareSpace duplicates the page's h1 for every mid-page
+   section break), which we don't replicate for accessibility (one h1 per
+   page). Font size still matches the live site's 49px visual size.
+   Selector is `.dlf-section-hero .dlf-section-hero__title`, not just the
+   single class, so it outranks ".dlf-plain-page__inner h2" further down
+   (an element+class selector, which beats a lone class on specificity) --
+   that rule was silently winning for font-size/text-transform before,
+   capping this at 22.4px regardless of what was set here. */
+.dlf-section-hero .dlf-section-hero__title {
+	position: relative;
+	color: #fff;
+	font-family: var(--dlf-font-heading);
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: clamp(1.75rem, 3.2vw, 3.0625rem); /* 49px at desktop widths, matches .dlf-hero__title */
+	letter-spacing: normal;
+	text-shadow: 0 2px 20px rgba(0,0,0,.5);
+}
+
+/* Drift animation tied to the section's own visibility (view-timeline) --
+   works regardless of how far down the page this section lands, unlike the
+   page-level hero's `scroll(root)` timeline above.
+
+   ∓7% here, not ∓9%: the static `top: -9%` above is container-relative,
+   but this `transform: translateY(%)` is relative to the img's own
+   118%-tall box, so the two don't share a reference frame -- ∓9% in the
+   box's own terms is actually ∓10.62% of the container, overshooting the
+   ∓9% of headroom `height: 118%` provides and exposing a gap at both ends
+   of the scroll-through. ∓7% (≈∓8.26% container-relative) stays safely
+   inside that budget. See the near-identical bug (and full writeup) fixed
+   on .dlf-hero__img's drift above. */
+@supports (animation-timeline: view()) {
+	@keyframes dlf-section-hero-drift {
+		from { transform: translateY(-7%); }
+		to   { transform: translateY(7%); }
+	}
+	.dlf-section-hero img {
+		animation: dlf-section-hero-drift linear both;
+		animation-timeline: view();
+		animation-range: cover;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dlf-section-hero img {
+		animation: none;
+		transform: none;
+	}
+}
+
+/* ---- Core-values icon row ---- */
+/* About page post_content only: the 5 colored circle icons (Integrity,
+   Interdependence, Resilience, Humbition, Courage) below the core-values
+   bullet list. Lives in the WP database, not a template file. No max-width
+   here on purpose (Than found the old 480px-capped version too small) --
+   the row fills the full content column and each circle scales with it,
+   down to the 3-column mobile override further below. */
+.dlf-values-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 1.5rem;
+	margin: 1.5rem 0 2rem;
+}
+
+.dlf-values-grid img {
+	width: 100%;
+	border-radius: 50%;
+}
+
+/* ---- Team / community-fellow headshot grid ---- */
+/* About page post_content only: "Leadership Team" and "Community Fellows"
+   headshot grids ("Meet the Team" section). Lives in the WP database, not
+   a template file. Images fixed 214x214 to match the live site (confirmed
+   via live inspection: rendered team headshots there measure exactly
+   214.5x214.5). */
+.dlf-team-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 214px);
+	gap: 1.75rem;
+	margin: 1.5rem 0 2rem;
+}
+
+.dlf-team-member img {
+	width: 214px;
+	height: 214px;
+	object-fit: cover;
+	border-radius: 4px;
+	margin-bottom: 0.6rem;
+}
+
+.dlf-team-member p {
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+/* ---- Page photo figure ---- */
+/* Any page.php post_content with an inline <figure class="dlf-page-photo">
+   (e.g. About's "countries our Fellows come from" map). Optional
+   <figcaption> renders as small italic muted text below the image. */
+
+.dlf-page-photo {
+	margin: 1.5rem 0;
+}
+
+.dlf-page-photo img {
+	width: 100%;
+	border-radius: 4px;
+}
+
+.dlf-page-photo figcaption {
+	margin-top: 0.5rem;
+	font-size: 0.85rem;
+	color: var(--dlf-muted);
+	font-style: italic;
+}
+
+/* ---- External links row ---- */
+/* page.php post_content: a horizontal row of plain links (e.g. Apply
+   page's application-portal links). No special visual treatment beyond
+   spacing -- links themselves are styled by ".dlf-plain-page__inner a" above. */
+.dlf-external-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin: 1.5rem 0;
+}
+
+/* ---- FAQ accordion ---- */
+/* Apply page post_content only, native details/summary elements, no JS
+   needed. Lives in the WP database, not a template file. */
+.dlf-faq-category {
+	margin: 2rem 0 1rem;
+	font-family: var(--dlf-font-heading);
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: 1.1rem;
+}
+
+.dlf-faq-item {
+	border-bottom: 1px solid var(--dlf-rule);
+	padding: 0.9rem 0;
+}
+
+.dlf-faq-item summary {
+	font-weight: 700;
+	cursor: pointer;
+	color: var(--dlf-heading-color);
+}
+
+.dlf-faq-item p {
+	margin: 0.75rem 0 0;
+}
+
+/* ---- Mobile breakpoint (<=700px) ---- */
+/* Overrides several sections above for narrow viewports: header stacks
+   vertically, footer link columns go single-column, the fellow modal and
+   its image shrink, and the core-values row drops from 5 columns to 3. */
+@media (max-width: 700px) {
+	.dlf-site-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+	.dlf-site-header__menu {
+		gap: 1rem;
+	}
+	.dlf-footer-columns {
+		grid-template-columns: 1fr;
+		justify-items: center;
+		text-align: center;
+	}
+	.dlf-fellow-modal {
+		max-height: 88vh;
+	}
+	#dlf-fellow-modal-content {
+		grid-template-columns: 1fr;
+	}
+	.dlf-fellow-modal__header img {
+		width: 120px;
+		aspect-ratio: 1 / 1;
+	}
+	.dlf-values-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}

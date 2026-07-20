@@ -1,0 +1,17 @@
+/*
+Theme Name: DLF (Kadence Child)
+Theme URI: https://www.dalailamafellows.com/
+Description: Dalai Lama Fellows site — Kadence child theme. Chrome (header,
+  footer, nav, base typography/colors, buttons) is Kadence Global Styles +
+  Header/Footer Builder, configured in wp-admin (Customizer > Kadence). This
+  stylesheet carries only the site's custom components that don't map to a
+  Kadence/core block: the fellows archive grid + modal, the mid-page
+  full-bleed parallax section-hero, the core-values icon row, the team grid,
+  and the accessible scroll-driven parallax variants. See
+  docs/decision-kadence-child-theme.md for the conversion plan and
+  docs/full-width-parallax-hero.md for how the parallax variants work.
+Template: kadence
+Author: CSC / Than Grove
+Version: 0.1.0
+Text Domain: dlf-child
+*/
