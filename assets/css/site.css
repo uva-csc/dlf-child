@@ -7,6 +7,16 @@
  * (Than's Creative Cloud account, enqueued in functions.php), same as the
  * live site, not a substitute.
  *
+ * Pruned 2026-07-21 for the Kadence child-theme conversion (Sprint K1): the
+ * site header/nav is now Kadence's Header Builder + Global Styles, not this
+ * file — its CSS (and old markup classes) has been removed. Font-family
+ * assignment (body/headings) stays here on purpose: Kadence's Customizer
+ * can't reference the Adobe Fonts kit, so the base element resets below are
+ * still doing real work, not just legacy chrome. The footer is Kadence's
+ * Footer Builder for placement/mechanism, but the visible footer markup is
+ * still a Custom HTML widget reusing the `.dlf-footer-*` classes below —
+ * that section stays. See docs/decision-kadence-child-theme.md.
+ *
  * ---------------------------------------------------------------------------
  * QUICK INDEX — search for the "---- Name ----" banner to jump to a section.
  * Each entry also lists which template(s)/page(s) actually render it, so you
@@ -14,9 +24,8 @@
  * ---------------------------------------------------------------------------
  *   Design tokens (:root)          design vars used everywhere below
  *   Base element resets            *, body, strong/b, h1-h4, a, img (all pages)
- *   Site header / nav              parts/header.php (every page)
  *   Plain page fallback wrapper    page.php (the 6 static content pages)
- *   Footer                         parts/footer.php (every page)
+ *   Footer                         Custom HTML widget in Footer 1 (every page)
  *   Homepage hero                  front-page.php chrome (title/image from
  *                                    the "Reimagine Leadership" Page, see below)
  *   Mission section                Homepage ("Reimagine Leadership" Page)
@@ -104,76 +113,6 @@ img {
 	max-width: 100%;
 	height: auto;
 	display: block;
-}
-
-/* ---- Site header / nav ---- */
-/* parts/header.php, included on every page. Two visual modes: normal
-   (opaque, dark text) and overlaid-on-hero (transparent, white text via
-   .dlf-hero .dlf-site-header below) -- the latter is used whenever a page
-   has a full-bleed photo hero behind the header (homepage + all static
-   pages via page.php). */
-
-.dlf-site-header {
-	position: relative;
-	z-index: 10;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 2rem;
-	padding: 1.25rem 2rem;
-	color: var(--dlf-header-fg, var(--dlf-heading-color));
-}
-
-/* "DALAI LAMA FELLOWS" wordmark, top-left of every page. */
-.dlf-site-header__logo {
-	font-family: var(--dlf-font-heading);
-	font-weight: 700;
-	font-size: 1.375rem; /* 22px -- matches live site's header wordmark */
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	text-decoration: none;
-	color: inherit;
-}
-
-/* Top-right nav: About / The Fellowship / Apply / Meet the Fellows / Donate / Contact Us */
-.dlf-site-header__menu {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1.75rem;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.dlf-site-header__menu a {
-	font-family: var(--dlf-font-body);
-	font-size: 0.8125rem; /* 13px -- matches live site's nav links */
-	font-weight: 500;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	text-decoration: none;
-	color: inherit;
-}
-
-.dlf-site-header__menu a:hover {
-	text-decoration: underline;
-}
-
-/* Current page's nav link stays underlined, matching the live site.
-   `.current-menu-item` is added automatically by wp_nav_menu() (WordPress
-   compares each menu item's URL against the current request) -- no
-   per-page template logic needed here. */
-.dlf-site-header__menu .current-menu-item > a {
-	text-decoration: underline;
-}
-
-/* Overlaid transparent on a hero photo, white text (matches the live site) */
-.dlf-hero .dlf-site-header {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	--dlf-header-fg: #fff;
 }
 
 /* ---- Plain page fallback wrapper ---- */
@@ -1055,18 +994,11 @@ img {
 }
 
 /* ---- Mobile breakpoint (<=700px) ---- */
-/* Overrides several sections above for narrow viewports: header stacks
-   vertically, footer link columns go single-column, the fellow modal and
-   its image shrink, and the core-values row drops from 5 columns to 3. */
+/* Overrides several sections above for narrow viewports: footer link
+   columns go single-column, the fellow modal and its image shrink, and the
+   core-values row drops from 5 columns to 3. Header/nav responsiveness is
+   now Kadence's own (mobile menu toggle etc.), not handled here. */
 @media (max-width: 700px) {
-	.dlf-site-header {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.75rem;
-	}
-	.dlf-site-header__menu {
-		gap: 1rem;
-	}
 	.dlf-footer-columns {
 		grid-template-columns: 1fr;
 		justify-items: center;
