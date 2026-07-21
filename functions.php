@@ -6,9 +6,11 @@
  * Kadence Global Styles + Header/Footer Builder in the Customizer, not code
  * -- see docs/decision-kadence-child-theme.md. This file only wires up
  * what Kadence doesn't provide: the Adobe Fonts kit, the carried-over
- * component stylesheet, and the fellow-card thumbnail size (used by the
- * archive grid, ported in Sprint K2).
+ * component stylesheet, the fellow-card thumbnail size, the shared card-grid
+ * helper, and the fellows-archive facet JS (all ported in Sprint K2).
  */
+
+require get_stylesheet_directory() . '/functions/card-grid.php';
 
 add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style(
@@ -33,6 +35,19 @@ add_action( 'wp_enqueue_scripts', function () {
 		array( 'dlf-kadence-parent', 'dlf-fonts' ),
 		filemtime( get_stylesheet_directory() . '/assets/css/site.css' )
 	);
+
+	if ( is_post_type_archive( 'fellow' ) ) {
+		wp_enqueue_script(
+			'dlf-fellows-archive',
+			get_stylesheet_directory_uri() . '/assets/js/fellows-archive.js',
+			array(),
+			filemtime( get_stylesheet_directory() . '/assets/js/fellows-archive.js' ),
+			true
+		);
+		wp_localize_script( 'dlf-fellows-archive', 'dlfFellows', array(
+			'restUrl' => esc_url_raw( rest_url( 'dlf/v1/fellows' ) ),
+		) );
+	}
 }, 20 );
 
 add_action( 'after_setup_theme', function () {

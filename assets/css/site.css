@@ -602,14 +602,23 @@ img {
 	background: rgba(0,0,0,.8);
 }
 
-.dlf-fellow-modal__close {
+/* Compound selector (not just the single class) + explicit longhands --
+   Kadence's Global Styles apply a filled button look to bare <button>
+   elements, and beating it reliably needs both higher specificity and
+   resetting every property it might touch (shorthand `background: none`
+   alone wasn't enough once this lived under Kadence). */
+.dlf-fellow-modal .dlf-fellow-modal__close {
 	position: absolute;
 	top: 1rem;
 	right: 1.25rem;
 	font-size: 1.5rem;
 	line-height: 1;
 	background: none;
+	background-color: transparent;
 	border: none;
+	box-shadow: none;
+	appearance: none;
+	-webkit-appearance: none;
 	color: var(--dlf-muted);
 	cursor: pointer;
 }

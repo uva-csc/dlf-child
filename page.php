@@ -14,7 +14,7 @@ while ( have_posts() ) :
 	the_post();
 	$hero_image = get_the_post_thumbnail_url( get_the_ID(), 'full' );
 	if ( ! $hero_image ) {
-		$hero_image = get_template_directory_uri() . '/assets/images/fellows-banner.jpg';
+		$hero_image = get_stylesheet_directory_uri() . '/assets/images/fellows-banner.jpg';
 	}
 	?>
 

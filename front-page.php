@@ -14,7 +14,7 @@ get_header();
 $front      = get_post( (int) get_option( 'page_on_front' ) );
 $hero_image = get_the_post_thumbnail_url( $front, 'full' );
 if ( ! $hero_image ) {
-	$hero_image = get_template_directory_uri() . '/assets/images/fellows-banner.jpg';
+	$hero_image = get_stylesheet_directory_uri() . '/assets/images/fellows-banner.jpg';
 }
 ?>
 
