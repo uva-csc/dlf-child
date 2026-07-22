@@ -17,6 +17,15 @@
  * still a Custom HTML widget reusing the `.dlf-footer-*` classes below —
  * that section stays. See docs/decision-kadence-child-theme.md.
  *
+ * Updated 2026-07-22 for Sprint K2 step 4: the homepage's two full-bleed
+ * content photos are now Kadence Row Layout + Image blocks (not raw HTML) —
+ * the `.dlf-content-photo`/`--parallax` rules below are unchanged in
+ * purpose but their `height`/`top` are now `vh`-based, not `%`, because a
+ * Kadence Row Layout's Column wrapper puts its own `position: relative`
+ * ancestor between the classed row and the `<img>`, breaking the old
+ * percentage reference-frame math. Full writeup: docs/
+ * full-width-parallax-hero.md §4.
+ *
  * ---------------------------------------------------------------------------
  * QUICK INDEX — search for the "---- Name ----" banner to jump to a section.
  * Each entry also lists which template(s)/page(s) actually render it, so you
@@ -30,8 +39,11 @@
  *                                    the "Reimagine Leadership" Page, see below)
  *   Mission section                Homepage ("Reimagine Leadership" Page)
  *                                    post_content only
- *   Full-bleed content photo       Homepage post_content only (add class
- *                                    dlf-content-photo--parallax for drift)
+ *   Full-bleed content photo       Homepage post_content only -- editor-
+ *                                    managed Kadence Row Layout + Image
+ *                                    blocks (add class dlf-content-photo,
+ *                                    +--parallax for drift; see docs/
+ *                                    full-width-parallax-hero.md §4)
  *   Pull-quote                     Homepage post_content only
  *   Outlined pill button           Homepage post_content ("Our Approach" button)
  *   Fellows archive + modal        archive-fellow.php, taxonomy.php
@@ -389,6 +401,7 @@ img {
 	width: 100%;
 	max-height: 70vh;
 	object-fit: cover;
+	object-position: top;
 }
 
 /* Opt-in scroll-driven drift for any .dlf-content-photo -- add the class
@@ -412,16 +425,30 @@ img {
 	position: absolute;
 	inset: 0;
 	width: 100%;
-	height: 118%; /* headroom for the drift animation below, so it never exposes an empty edge */
+	/* height/top are vh-based, not %, because inside a Kadence Row Layout
+	   block the img's containing block (its nearest positioned ancestor)
+	   is Kadence's own auto-height .kt-inside-inner-col wrapper, not this
+	   element -- percentages here would resolve against that tiny box
+	   instead of the intended 70vh. vh sidesteps the containing block
+	   entirely. Values are 136%/-18% of the 70vh above (roughly double the
+	   headroom of the matching .dlf-section-hero rule's 118%/-9%, to budget
+	   for the doubled drift amplitude below). */
+	height: 95.2vh; /* headroom for the drift animation below, so it never exposes an empty edge */
 	max-height: none;
-	top: -9%;
+	top: -12.6vh;
 	object-fit: cover;
 }
 
 @supports (animation-timeline: view()) {
+	/* ∓12% here, not ∓18%: this transform is relative to the img's own
+	   136%-tall box, so ∓18% in the box's own terms would be ∓24.5% of the
+	   container, overshooting the ∓18% headroom above. ∓12% (≈∓16.3%
+	   container-relative) stays safely inside that budget -- same margin
+	   ratio as the original ∓7%/118%/-9% design, just scaled ~2x for more
+	   noticeable motion. */
 	@keyframes dlf-content-photo-drift {
-		from { transform: translateY(-7%); }
-		to   { transform: translateY(7%); }
+		from { transform: translateY(-12%); }
+		to   { transform: translateY(12%); }
 	}
 	.dlf-content-photo.dlf-content-photo--parallax img {
 		animation: dlf-content-photo-drift linear both;
@@ -836,8 +863,8 @@ img {
 	position: absolute;
 	inset: 0;
 	width: 100%;
-	height: 118%; /* headroom for the drift animation below, so it never exposes an empty edge */
-	top: -9%;
+	height: 136%; /* headroom for the drift animation below, so it never exposes an empty edge */
+	top: -18%;
 	object-fit: cover;
 }
 
@@ -872,18 +899,20 @@ img {
    works regardless of how far down the page this section lands, unlike the
    page-level hero's `scroll(root)` timeline above.
 
-   ∓7% here, not ∓9%: the static `top: -9%` above is container-relative,
+   ∓12% here, not ∓18%: the static `top: -18%` above is container-relative,
    but this `transform: translateY(%)` is relative to the img's own
-   118%-tall box, so the two don't share a reference frame -- ∓9% in the
-   box's own terms is actually ∓10.62% of the container, overshooting the
-   ∓9% of headroom `height: 118%` provides and exposing a gap at both ends
-   of the scroll-through. ∓7% (≈∓8.26% container-relative) stays safely
-   inside that budget. See the near-identical bug (and full writeup) fixed
-   on .dlf-hero__img's drift above. */
+   136%-tall box, so the two don't share a reference frame -- ∓18% in the
+   box's own terms would be ∓24.5% of the container, overshooting the
+   ∓18% of headroom `height: 136%` provides and exposing a gap at both ends
+   of the scroll-through. ∓12% (≈∓16.3% container-relative) stays safely
+   inside that budget -- same margin ratio as the original ∓7%/118%/-9%
+   design (see .dlf-content-photo's matching rule), just scaled ~2x for
+   more noticeable motion. See the near-identical bug (and full writeup)
+   fixed on .dlf-hero__img's drift above. */
 @supports (animation-timeline: view()) {
 	@keyframes dlf-section-hero-drift {
-		from { transform: translateY(-7%); }
-		to   { transform: translateY(7%); }
+		from { transform: translateY(-12%); }
+		to   { transform: translateY(12%); }
 	}
 	.dlf-section-hero img {
 		animation: dlf-section-hero-drift linear both;
