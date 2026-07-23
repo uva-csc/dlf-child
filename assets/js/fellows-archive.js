@@ -74,7 +74,7 @@
 			if ( year && f.year !== year ) {
 				return false;
 			}
-			if ( region && f.region !== region ) {
+			if ( region && f.regions.indexOf( region ) === -1 ) {
 				return false;
 			}
 			if ( country && f.countries.indexOf( country ) === -1 ) {
