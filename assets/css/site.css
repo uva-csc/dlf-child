@@ -373,7 +373,7 @@ img {
 }
 
 .dlf-mission__inner {
-	max-width: 760px;
+	max-width: 960px;
 	margin: 0 auto;
 	text-align: center;
 }
@@ -461,6 +461,67 @@ img {
 	.dlf-content-photo.dlf-content-photo--parallax img {
 		animation: none;
 		transform: none;
+	}
+}
+
+/* ---- Silhouette photo: fixed-background reveal (matches the live SquareSpace
+   site's effect, confirmed by inspecting it directly) ---- */
+/* What the live site actually does (verified in the DOM): the photo is held
+   *stationary relative to the viewport* the whole time the section is on
+   screen, while the section's own box scrolls up over it like a window --
+   so a different horizontal slice of the (viewport-anchored) image is
+   revealed as you scroll. The image never moves; only which part shows
+   through the window changes. On squarespace this is JS + `position: fixed`.
+
+   The pure-CSS name for exactly this is `background-attachment: fixed`: the
+   background is positioned against the viewport, not the element, and only
+   the part inside the element's box paints. An earlier attempt used
+   `position: sticky` instead, but sticky gives a "scroll in -> pin at top
+   -> scroll out" motion where the *same* crop shows during the pin -- Than
+   correctly flagged that as wrong ("just sticks to the top then moves on").
+   background-attachment:fixed has no pin/release phases at all, which is the
+   whole point.
+
+   Editor-manageability: background-attachment:fixed needs the image as a CSS
+   *background*, but this photo is an editor-managed Kadence Image block
+   (an <img>), and we won't hardcode a URL that silently goes stale if the
+   editor swaps the photo (see docs/.../editor-self-service-principle). So a
+   tiny front-page script (functions.php -> homepage-parallax.js) copies the
+   <img>'s own src into the `--dlf-silhouette-bg` custom property and adds the
+   `.is-fixed-bg` class. Progressive enhancement: with no JS (or before the
+   image loads) the class is absent and the plain <img> below just renders as
+   an ordinary full-bleed band -- never a blank gap. */
+.dlf-content-photo.dlf-content-photo--silhouette img {
+	width: 100%;
+	max-height: 70vh;
+	object-fit: cover;
+	object-position: center;
+	animation: none; /* cancels the shared --parallax drift keyframes */
+}
+
+/* Enhanced state (added by JS once the img src is known): swap the <img> for
+   a viewport-fixed background on the Kadence column wrapper, which is the
+   visible window. Height 70vh matches the plain band above for consistency. */
+.dlf-content-photo.dlf-content-photo--silhouette.is-fixed-bg .kt-inside-inner-col {
+	height: 70vh;
+	background-image: var(--dlf-silhouette-bg);
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+.dlf-content-photo.dlf-content-photo--silhouette.is-fixed-bg img {
+	display: none;
+}
+
+/* Reduced motion: a fixed background is scroll-linked parallax, so pin the
+   background to normal scroll -- the photo still shows, just without the
+   viewport-anchored reveal. (iOS Safari also silently falls back to `scroll`
+   since it doesn't support fixed attachment -- same graceful result.) */
+@media (prefers-reduced-motion: reduce) {
+	.dlf-content-photo.dlf-content-photo--silhouette.is-fixed-bg .kt-inside-inner-col {
+		background-attachment: scroll;
 	}
 }
 

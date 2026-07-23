@@ -48,6 +48,20 @@ add_action( 'wp_enqueue_scripts', function () {
 			'restUrl' => esc_url_raw( rest_url( 'dlf/v1/fellows' ) ),
 		) );
 	}
+
+	// Homepage silhouette photo: syncs the editor-managed <img> src into the
+	// CSS custom property that drives its background-attachment:fixed reveal
+	// (see assets/js/homepage-parallax.js and .dlf-content-photo--silhouette
+	// in site.css).
+	if ( is_front_page() ) {
+		wp_enqueue_script(
+			'dlf-homepage-parallax',
+			get_stylesheet_directory_uri() . '/assets/js/homepage-parallax.js',
+			array(),
+			filemtime( get_stylesheet_directory() . '/assets/js/homepage-parallax.js' ),
+			true
+		);
+	}
 }, 20 );
 
 add_action( 'after_setup_theme', function () {
