@@ -68,3 +68,26 @@ add_action( 'after_setup_theme', function () {
 	// Card grid thumbnail — keeps the archive from shipping full-res headshots.
 	add_image_size( 'fellow-card', 320, 320, true );
 } );
+
+/**
+ * Force Kadence's Transparent Header on the fellow views. Their .dlf-hero--page
+ * banner (archive-fellow.php / single-fellow.php / taxonomy.php) is meant to
+ * sit UNDER the header like the homepage and static pages -- so the banner
+ * image runs full-bleed to the top and the white logo/nav overlay it -- not
+ * below a solid white header bar (on which the white logo is invisible).
+ * Kadence assembles the per-view layout (including the 'transparent' key) and
+ * exposes it via the `kadence_post_layout` filter; the transparent-header
+ * styling itself is already configured in the Customizer for the rest of the
+ * site, so we only need to flip it on for these views. Done in code (not a
+ * Customizer toggle) so it's version-controlled and can't silently drift.
+ */
+add_filter( 'kadence_post_layout', function ( $layout ) {
+	if (
+		is_post_type_archive( 'fellow' )
+		|| is_singular( 'fellow' )
+		|| is_tax( array( 'fellowship_year', 'region', 'country' ) )
+	) {
+		$layout['transparent'] = 'enable';
+	}
+	return $layout;
+} );

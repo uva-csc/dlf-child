@@ -844,26 +844,55 @@ img {
    and Learn More links below. */
 
 .dlf-fellow-single {
-	max-width: 760px;
+	max-width: 960px;
 	margin: 0 auto;
 	padding: 3rem 1.5rem 5rem;
+	display: flow-root; /* contain the floated portrait below */
 }
 
 .dlf-fellow-single__breadcrumb {
-	margin: 0 0 1.5rem;
+	margin: 0;
+}
+
+/* The fellow's portrait, floated so the meta chips + bio sections wrap to its
+   right and continue below it. Same soft card shadow as the archive tiles. */
+.dlf-fellow-single__portrait {
+	float: left;
+	width: 240px;
+	max-width: 42%;
+	height: auto;
+	margin: 0.25rem 1.75rem 1rem 0;
+	box-shadow: 0 0 6px rgba(0,0,0,.10), 0 4px 16px rgba(0,0,0,.14);
+}
+
+/* On narrow screens, stop floating -- a 240px float beside text is too tight;
+   show the portrait full-width above the text instead. */
+@media (max-width: 560px) {
+	.dlf-fellow-single__portrait {
+		float: none;
+		display: block;
+		width: 220px;
+		max-width: 70%;
+		margin: 0 0 0.5rem;
+	}
 }
 
 .dlf-fellow-single__breadcrumb a {
 	text-decoration: underline;
 	color: var(--dlf-muted);
 }
+.dlf-fellow-title {
+	margin: 0.5rem auto;
+	font-size: 220%;
+}
 
 /* Year / region / country chip row, each chip links back to the filtered archive */
 .dlf-fellow-single__meta {
 	display: flex;
 	flex-wrap: wrap;
+	/* justify-content: flex-end; Aligns items to the right */
 	gap: 0.5rem;
-	margin-bottom: 2.5rem;
+	margin: 0.5rem 0 1rem;
 }
 
 .dlf-fellow-meta-chip {
@@ -888,15 +917,24 @@ img {
 	font-family: var(--dlf-font-body);
 	font-size: 1.25rem;
 	font-weight: 700;
+	text-align: center;
 	text-transform: none;
 	color: var(--dlf-heading-color);
 	margin: 0 0 0.75rem;
+}
+
+.dlf-fellow-single__section-label.learn-more {
+	text-align: left;
 }
 
 .dlf-fellow-single__learn-more {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
+}
+
+.dlf-fellow-single__learn-more .dlf-btn-pill {
+	padding: 0.5rem 0.75rem;
 }
 
 /* ---- Plain content page typography ---- */
@@ -924,7 +962,7 @@ img {
 }
 
 .dlf-plain-page__inner p {
-	margin: 0 0 1.25rem;
+	margin: 1rem 0 0 0;
 }
 
 .dlf-plain-page__inner ul, .dlf-plain-page__inner ol {
@@ -1151,7 +1189,7 @@ img {
 	font-family: var(--dlf-font-heading);
 	font-weight: 700;
 	text-transform: uppercase;
-	font-size: 1.1rem;
+	font-size: 2rem;
 }
 
 .dlf-faq-item {

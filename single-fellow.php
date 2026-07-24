@@ -31,21 +31,34 @@ while ( have_posts() ) :
 		$learn_more = array();
 	}
 
-	$hero_image = get_the_post_thumbnail_url( get_the_ID(), 'full' );
-	if ( ! $hero_image ) {
-		$hero_image = get_stylesheet_directory_uri() . '/assets/images/fellows-banner.jpg';
-	}
+	// Deliberately the generic fellows banner, NOT the fellow's own headshot
+	// -- the hero matches the archive ("Meet the Fellows") page; the fellow's
+	// portrait goes in the content below, floated. Title is the fellow's name.
+	$hero_image = get_stylesheet_directory_uri() . '/assets/images/fellows-banner.jpg';
 	?>
 
 	<div class="dlf-hero dlf-hero--page">
 		<img class="dlf-hero__img" src="<?php echo esc_url( $hero_image ); ?>" alt="" aria-hidden="true">
-		<h1 class="dlf-hero__title"><?php the_title(); ?></h1>
+		<h1 class="dlf-hero__title">Dalai Lama Fellows</h1>
 	</div>
 
 	<main class="dlf-fellow-single">
 		<p class="dlf-fellow-single__breadcrumb">
 			<a href="<?php echo esc_url( get_post_type_archive_link( 'fellow' ) ); ?>">&larr; All Fellows</a>
 		</p>
+
+        <h2 class="dlf-fellow-title"><?php the_title(); ?></h2>
+
+		<?php if ( has_post_thumbnail() ) : ?>
+			<?php echo get_the_post_thumbnail(
+				get_the_ID(),
+				'medium',
+				array(
+					'class' => 'dlf-fellow-single__portrait',
+					'alt'   => the_title_attribute( array( 'echo' => false ) ),
+				)
+			); ?>
+		<?php endif; ?>
 
 		<div class="dlf-fellow-single__meta">
 			<?php foreach ( $years as $term ) : ?>
@@ -61,19 +74,19 @@ while ( have_posts() ) :
 
 		<?php if ( $leadership_vision ) : ?>
 			<section class="dlf-fellow-single__section">
-				<h2 class="dlf-fellow-single__section-label">Leadership Vision</h2>
+				<h3 class="dlf-fellow-single__section-label">Leadership Vision</h3>
 				<?php echo $leadership_vision; // phpcs:ignore -- trusted admin-authored HTML, same as post content. ?>
 			</section>
 		<?php endif; ?>
 
 		<section class="dlf-fellow-single__section">
-			<h2 class="dlf-fellow-single__section-label">Project Description</h2>
+			<h3 class="dlf-fellow-single__section-label">Project Description</h3>
 			<?php echo $project_description; // phpcs:ignore ?>
 		</section>
 
 		<?php if ( ! empty( $learn_more ) ) : ?>
 			<section class="dlf-fellow-single__section">
-				<h2 class="dlf-fellow-single__section-label">Learn More</h2>
+				<h3 class="dlf-fellow-single__section-label learn-more">Learn More</h3>
 				<div class="dlf-fellow-single__learn-more">
 					<?php foreach ( $learn_more as $link ) : ?>
 						<a class="dlf-btn-pill" href="<?php echo esc_url( $link['url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $link['text'] ); ?></a>
