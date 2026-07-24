@@ -86,7 +86,16 @@
 
 body {
 	margin: 0;
-	overflow-x: hidden; /* 100vw full-bleed breakouts (.dlf-section-hero) can be a hair wider than the viewport on some scrollbar configs */
+	/* clip, NOT hidden: both keep 100vw full-bleed breakouts
+	   (.dlf-section-hero etc.) from spawning a horizontal scrollbar, but
+	   `overflow-x: hidden` forces overflow-y to compute to `auto`, turning
+	   <body> into a (non-scrolling) scroll container -- which inactivates
+	   every root-relative scroll-driven animation on the site (their
+	   ViewTimeline.currentTime goes null and the drift freezes). `clip`
+	   clips identically without establishing a scroll container, so the
+	   view()/named-timeline drifts keep working. Same clip-vs-hidden gotcha
+	   documented on .dlf-section-hero below. */
+	overflow-x: clip;
 	font-family: var(--dlf-font-body);
 	font-weight: 300; /* body copy is intentionally light -- matches the live site */
 	font-size: 18px;
@@ -947,6 +956,11 @@ img {
    capping this at 22.4px regardless of what was set here. */
 .dlf-section-hero .dlf-section-hero__title {
 	position: relative;
+	/* Above the ::after gradient overlay. Both the title and ::after are
+	   positioned with auto z-index, so without this the ::after (the last
+	   child in tree order) paints over the white title and tints it gray --
+	   very visible over a bright photo like "Our Origin". */
+	z-index: 1;
 	color: #fff;
 	font-family: var(--dlf-font-heading);
 	font-weight: 700;
