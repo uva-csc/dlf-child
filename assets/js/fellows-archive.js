@@ -13,6 +13,7 @@
 	var yearSelect = document.getElementById( 'dlf-facet-year' );
 	var regionSelect = document.getElementById( 'dlf-facet-region' );
 	var countrySelect = document.getElementById( 'dlf-facet-country' );
+	var sortSelect = document.getElementById( 'dlf-facet-sort' );
 	var modal = document.getElementById( 'dlf-fellow-modal' );
 	var modalContent = document.getElementById( 'dlf-fellow-modal-content' );
 	var modalClose = document.getElementById( 'dlf-fellow-modal-close' );
@@ -48,11 +49,20 @@
 		var img = fellow.headshot
 			? '<img src="' + escapeHtml( fellow.headshot ) + '" alt="" loading="lazy">'
 			: '';
+		// Country/ies for the hover/focus overlay -- mirrors the server-rendered
+		// markup in functions/card-grid.php so both paths style identically.
+		var countryLabel = ( fellow.countries && fellow.countries.length )
+			? fellow.countries.join( ', ' )
+			: '';
+		var overlay = countryLabel
+			? '<span class="dlf-fellow-card__country">' + escapeHtml( countryLabel ) + '</span>'
+			: '';
 		return (
 			'<a class="dlf-fellow-card" href="' + escapeHtml( fellow.permalink ) + '" data-id="' + fellow.id + '">' +
 				'<span class="dlf-fellow-card__image">' + img + '</span>' +
 				'<span class="dlf-fellow-card__name">' + escapeHtml( fellow.name ) + '</span>' +
 				'<span class="dlf-fellow-card__year">' + escapeHtml( fellow.year ) + '</span>' +
+				overlay +
 			'</a>'
 		);
 	}
@@ -63,6 +73,35 @@
 			return;
 		}
 		grid.innerHTML = '<div class="dlf-fellow-grid">' + list.map( renderCard ).join( '' ) + '</div>';
+	}
+
+	// Best-effort "last name" = the final word of the name, after dropping any
+	// trailing parenthetical (e.g. "(Mentorship Fellow '25)") and quote marks
+	// around a nickname (e.g. John "Alex" Pritz -> Pritz). Kept identical to
+	// dlf_fellow_last_name() in functions/card-grid.php so the no-JS baseline
+	// and this enhanced view sort the same way.
+	function lastName( name ) {
+		var n = ( name || '' )
+			.replace( /\s*\([^)]*\)/g, '' )   // drop "(...)" parentheticals
+			.replace( /["'‘’“”]/g, '' ) // drop quotes
+			.trim();
+		var parts = n.split( /\s+/ );
+		return parts.length ? parts[ parts.length - 1 ] : n;
+	}
+
+	// Two-level sort. Whichever field is chosen is primary; the other is the
+	// tiebreak. Year is always newest-first (descending, matching the live
+	// site); last name is always A->Z.
+	function sortList( list, mode ) {
+		return list.slice().sort( function ( a, b ) {
+			var ya = parseInt( a.year, 10 ) || 0;
+			var yb = parseInt( b.year, 10 ) || 0;
+			var byYear = yb - ya; // newest first
+			var byName = lastName( a.name ).localeCompare( lastName( b.name ) );
+			return mode === 'lastname'
+				? ( byName || byYear )
+				: ( byYear || byName );
+		} );
 	}
 
 	function applyFilters() {
@@ -83,7 +122,7 @@
 			return true;
 		} );
 
-		render( filtered );
+		render( sortList( filtered, sortSelect ? sortSelect.value : 'year' ) );
 	}
 
 	function openModal( fellow ) {
@@ -146,8 +185,10 @@
 		} );
 	}
 
-	[ yearSelect, regionSelect, countrySelect ].forEach( function ( select ) {
-		select.addEventListener( 'change', applyFilters );
+	[ yearSelect, regionSelect, countrySelect, sortSelect ].forEach( function ( select ) {
+		if ( select ) {
+			select.addEventListener( 'change', applyFilters );
+		}
 	} );
 
 	fetch( dlfFellows.restUrl )

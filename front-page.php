@@ -21,7 +21,7 @@ if ( ! $hero_image ) {
 <div class="dlf-hero-scroll">
 	<div class="dlf-hero dlf-hero--home">
 		<img class="dlf-hero__img" src="<?php echo esc_url( $hero_image ); ?>" alt="" aria-hidden="true">
-		<h1 class="dlf-hero__title"><?php echo esc_html( get_the_title( $front ) ); ?></h1>
+		<h1 class="dlf-hero__title"><?php echo get_the_title( $front ); ?></h1>
 		<span class="dlf-hero__cue" aria-hidden="true">&#8964;</span>
 	</div>
 
