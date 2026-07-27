@@ -1046,6 +1046,34 @@ img {
 	background: linear-gradient(180deg, rgba(0,0,0,.3), rgba(0,0,0,.35));
 }
 
+/* Enhanced state (added by homepage-parallax.js once the <img> src is known):
+   swap the drifting <img> for a viewport-fixed background on the hero box
+   itself -- the same background-attachment:fixed reveal the homepage
+   silhouette uses (see .dlf-content-photo--silhouette above), so "Our Origin"
+   reads as a window the section scrolls over rather than an image that drifts
+   inside its frame. Without JS the class is absent and the <img> + view()
+   drift below stay as the fallback. */
+.dlf-section-hero.is-fixed-bg {
+	background-image: var(--dlf-section-hero-bg);
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+.dlf-section-hero.is-fixed-bg img {
+	display: none;
+}
+
+/* Reduced motion (and iOS Safari, which ignores fixed attachment anyway):
+   pin the background to normal scroll -- the photo still shows, just without
+   the viewport-anchored reveal. */
+@media (prefers-reduced-motion: reduce) {
+	.dlf-section-hero.is-fixed-bg {
+		background-attachment: scroll;
+	}
+}
+
 /* Deliberately an <h2>, not <h1> -- the live site marks this up as a second
    h1.page-title (SquareSpace duplicates the page's h1 for every mid-page
    section break), which we don't replicate for accessibility (one h1 per
@@ -1123,22 +1151,60 @@ img {
 	border-radius: 50%;
 }
 
+/* ---- About page "Meet the Team" section title + subheads ---- */
+/* Matches the live site: "Meet the Team" is a full-bleed navy band; the
+   "Leadership Team" and "Community Fellows" h3s are centered + uppercase.
+   Pure CSS keyed to the #meet-the-team block anchor -- no post_content edit.
+   The 100vw / left:50% / margin-left:-50vw breakout is the same trick
+   .dlf-section-hero uses; it relies on the overflow-x:clip already set on
+   body/ancestors (see the note near the top of this file) so it doesn't
+   spawn a horizontal scrollbar. */
+.dlf-plain-page__inner h2#meet-the-team {
+	position: relative;
+	left: 50%;
+	width: 100vw;
+	margin: 3rem 0 2.5rem;
+	margin-left: -50vw;          /* must come AFTER the margin shorthand */
+	padding: 7.75rem 1.5rem;        /* ~80px top/bottom, like the live band */
+	background: rgba(8, 28, 99, 0.9);
+	color: #fff;
+	text-align: center;
+	font-size: clamp(2rem, 5vw, 49px);
+	font-weight: 700;
+	/* text-transform:uppercase is already inherited from
+	   ".dlf-plain-page__inner h2" above */
+}
+
+/* "Leadership Team" and "2026-2027 Community Fellows" -- both h3 siblings
+   after the band. General sibling (~) catches both and survives an editor
+   inserting a paragraph between them. */
+.dlf-plain-page__inner h2#meet-the-team ~ h3 {
+	font-family: var(--dlf-font-heading);
+	font-size: clamp(1.5rem, 3vw, 2.25rem);   /* ~36px */
+	font-weight: 700;
+	text-transform: uppercase;
+	text-align: center;
+	letter-spacing: 0.015em;                  /* ~0.54px at 36px */
+	color: var(--dlf-heading-color);
+	margin: 2.5rem 0 1.5rem;
+}
+
 /* ---- Team / community-fellow headshot grid ---- */
 /* About page post_content only: "Leadership Team" and "Community Fellows"
    headshot grids ("Meet the Team" section). Lives in the WP database, not
-   a template file. Images fixed 214x214 to match the live site (confirmed
-   via live inspection: rendered team headshots there measure exactly
-   214.5x214.5). */
+   a template file. Four fixed columns per row; images are fluid (width:100%
+   + square aspect-ratio) so they fill each column and stay square as the
+   column width flexes. */
 .dlf-team-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, 214px);
+	grid-template-columns: repeat(4, 1fr);
 	gap: 1.75rem;
 	margin: 1.5rem 0 2rem;
 }
 
 .dlf-team-member img {
-	width: 214px;
-	height: 214px;
+	width: 100%;
+	aspect-ratio: 1 / 1;
 	object-fit: cover;
 	border-radius: 4px;
 	margin-bottom: 0.6rem;

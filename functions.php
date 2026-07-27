@@ -49,11 +49,12 @@ add_action( 'wp_enqueue_scripts', function () {
 		) );
 	}
 
-	// Homepage silhouette photo: syncs the editor-managed <img> src into the
-	// CSS custom property that drives its background-attachment:fixed reveal
-	// (see assets/js/homepage-parallax.js and .dlf-content-photo--silhouette
-	// in site.css).
-	if ( is_front_page() ) {
+	// Fixed-background reveal: syncs an editor-managed <img> src into the CSS
+	// custom property that drives its background-attachment:fixed effect. Used
+	// by the homepage silhouette (.dlf-content-photo--silhouette) and the
+	// About page "Our Origin" mid-hero (.dlf-section-hero) -- so it loads on
+	// the front page and on any static Page. See assets/js/homepage-parallax.js.
+	if ( is_front_page() || is_page() ) {
 		wp_enqueue_script(
 			'dlf-homepage-parallax',
 			get_stylesheet_directory_uri() . '/assets/js/homepage-parallax.js',
