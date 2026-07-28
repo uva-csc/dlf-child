@@ -109,22 +109,22 @@ guide. Every class below is defined in `site.css`; search it for the
 
 ### The "blue stripe" — full-bleed navy title band
 
-The thick navy band with a centered heading (the About page's "Meet the Team").
-It is **pure CSS keyed to the HTML anchor `meet-the-team`** — the heading text
-itself is arbitrary.
+The thick navy band with a centered heading (first used for the About page's
+"Meet the Team"). It's an **opt-in CSS class**, so it works on any page — the
+heading text is arbitrary:
 
-- In the editor: add a **Heading (H2)** block, type the title, then in the
-  block's **Advanced → HTML anchor** set `meet-the-team`. That's it — it becomes
-  a full-bleed `rgba(8,28,99,0.9)` navy band, white, centered, uppercase, ~80px
+- In the editor: add a **Heading (H2)** block, type the title, then under
+  **Advanced → Additional CSS class(es)** add **`dlf-title-band`**. It becomes a
+  full-bleed `rgba(8,28,99,0.9)` navy band — white, centered, uppercase, ~80px
   vertical padding.
-- Any **H3** heading *after* that band on the same page auto-renders as a
-  centered uppercase subhead (the `h2#meet-the-team ~ h3` rule) — that's how
-  "Leadership Team" / "Community Fellows" are styled. Keep that in mind if you
-  add other H3s below it.
-- Equivalent Custom HTML: `<h2 id="meet-the-team">Your Title</h2>`.
-- The anchor is an `id`, which only needs to be unique *per page*, so you can
-  reuse `meet-the-team` on a new page to get the same band. To restyle it, edit
-  the `.dlf-plain-page__inner h2#meet-the-team` rule.
+- For the centered uppercase **subheads** under a band (e.g. "Leadership Team" /
+  "Community Fellows"), add the class **`dlf-section-subhead`** to those Heading
+  blocks the same way. It's opt-in per heading, so ordinary H3s elsewhere on the
+  page are unaffected.
+- Equivalent Custom HTML: `<h2 class="dlf-title-band">Your Title</h2>` and
+  `<h3 class="dlf-section-subhead">Your Subhead</h3>`.
+- To restyle either, edit `.dlf-plain-page__inner .dlf-title-band` /
+  `.dlf-plain-page__inner .dlf-section-subhead` in `site.css`.
 
 ### Photo heroes at the top of a page
 

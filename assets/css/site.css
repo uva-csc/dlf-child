@@ -1187,15 +1187,20 @@ img {
 	border-radius: 50%;
 }
 
-/* ---- About page "Meet the Team" section title + subheads ---- */
-/* Matches the live site: "Meet the Team" is a full-bleed navy band; the
-   "Leadership Team" and "Community Fellows" h3s are centered + uppercase.
-   Pure CSS keyed to the #meet-the-team block anchor -- no post_content edit.
-   The 100vw / left:50% / margin-left:-50vw breakout is the same trick
-   .dlf-section-hero uses; it relies on the overflow-x:clip already set on
-   body/ancestors (see the note near the top of this file) so it doesn't
-   spawn a horizontal scrollbar. */
-.dlf-plain-page__inner h2#meet-the-team {
+/* ---- Full-bleed navy title band + centered section subheads ---- */
+/* Reusable "blue stripe" section header (first used for the About page's
+   "Meet the Team"): a full-bleed navy band with a centered uppercase title.
+   Opt-in per block via CSS classes so it can be dropped on any page, NOT keyed
+   to a specific heading's anchor:
+     - add "dlf-title-band"   to a Heading block  -> the navy band
+     - add "dlf-section-subhead" to a Heading block -> a centered uppercase
+       subhead (e.g. "Leadership Team" / "Community Fellows" under the band)
+   (In wp-admin: select the Heading block -> Advanced -> "Additional CSS
+   class(es)".) The 100vw / left:50% / margin-left:-50vw breakout is the same
+   trick .dlf-section-hero uses; it relies on the overflow-x:clip already set on
+   body/ancestors (see the note near the top of this file) so it doesn't spawn a
+   horizontal scrollbar. */
+.dlf-plain-page__inner .dlf-title-band {
 	position: relative;
 	left: 50%;
 	width: 100vw;
@@ -1205,16 +1210,12 @@ img {
 	background: rgba(8, 28, 99, 0.9);
 	color: #fff;
 	text-align: center;
+	text-transform: uppercase;   /* self-contained -- don't depend on the base h2 rule */
 	font-size: clamp(2rem, 5vw, 49px);
 	font-weight: 700;
-	/* text-transform:uppercase is already inherited from
-	   ".dlf-plain-page__inner h2" above */
 }
 
-/* "Leadership Team" and "2026-2027 Community Fellows" -- both h3 siblings
-   after the band. General sibling (~) catches both and survives an editor
-   inserting a paragraph between them. */
-.dlf-plain-page__inner h2#meet-the-team ~ h3 {
+.dlf-plain-page__inner .dlf-section-subhead {
 	font-family: var(--dlf-font-heading);
 	font-size: clamp(1.5rem, 3vw, 2.25rem);   /* ~36px */
 	font-weight: 700;
