@@ -74,7 +74,219 @@ cd web/wp-content/themes
 git clone https://github.com/uva-csc/dlf-child.git dlf-child
 ```
 
-## Docs
+## Building pages — how to recreate the theme's signature features
 
-Design/decision write-ups (parallax technique, the Kadence conversion, this
-repo split) live in the monorepo under `docs/`.
+Most of the distinctive look is **CSS keyed to class names / anchors**, not
+template code — so you reproduce a feature by pasting the right markup into a
+**Custom HTML block** (or setting a Heading block's HTML anchor) in wp-admin,
+and the stylesheet (`assets/css/site.css`) styles it. This section is the field
+guide. Every class below is defined in `site.css`; search it for the
+`/* ---- Name ---- */` banners to see the exact rules and inline notes.
+
+### First, two things that govern everything
+
+- **Content width.** Static pages (`page.php`) render post_content inside
+  `.dlf-plain-page__inner`, a **960px centered column**. The homepage
+  (`front-page.php`) renders its content *without* that wrapper, so homepage
+  blocks can go edge-to-edge on their own. On a **static page**, anything that
+  must be full-viewport-width has to "break out" of the 960px column (next
+  point).
+- **The full-bleed breakout trick.** To make a block span the whole viewport
+  from inside a centered column, give it:
+
+  ```css
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;   /* must come after any `margin` shorthand */
+  ```
+
+  This is what the navy band and the mid-page section hero use. It only stays
+  scrollbar-free because `body` (and ancestors) are set to **`overflow-x: clip`**
+  — *not* `hidden`. `hidden` silently turns `<body>` into a scroll container and
+  **freezes every scroll-driven parallax on the site**. If drifts ever stop
+  animating, check for a stray `overflow-x: hidden` first.
+
+### The "blue stripe" — full-bleed navy title band
+
+The thick navy band with a centered heading (the About page's "Meet the Team").
+It is **pure CSS keyed to the HTML anchor `meet-the-team`** — the heading text
+itself is arbitrary.
+
+- In the editor: add a **Heading (H2)** block, type the title, then in the
+  block's **Advanced → HTML anchor** set `meet-the-team`. That's it — it becomes
+  a full-bleed `rgba(8,28,99,0.9)` navy band, white, centered, uppercase, ~80px
+  vertical padding.
+- Any **H3** heading *after* that band on the same page auto-renders as a
+  centered uppercase subhead (the `h2#meet-the-team ~ h3` rule) — that's how
+  "Leadership Team" / "Community Fellows" are styled. Keep that in mind if you
+  add other H3s below it.
+- Equivalent Custom HTML: `<h2 id="meet-the-team">Your Title</h2>`.
+- The anchor is an `id`, which only needs to be unique *per page*, so you can
+  reuse `meet-the-team` on a new page to get the same band. To restyle it, edit
+  the `.dlf-plain-page__inner h2#meet-the-team` rule.
+
+### Photo heroes at the top of a page
+
+These are **template-driven** (`page.php` / `front-page.php`), not authored in
+content — they come from the page's **Featured Image**:
+
+- **Full-height sticky + parallax-drift hero** (`.dlf-hero--home`): the homepage
+  and the About / Apply / The-Fellowship pages. The photo pins full-viewport and
+  the content panel rides up over it as you scroll, with a subtle image drift.
+  A page gets this automatically as long as it uses `page.php` and is **not**
+  Donate/Contact. Set the page's Featured Image and enable Kadence's Transparent
+  Header (so the white logo/nav sit over the photo).
+- **Short static banner** (`.dlf-hero--banner`): Donate + Contact only.
+  `page.php` branches on slug to render a shorter, non-parallax banner matching
+  the live site's SquareSpace page banner. Height is
+  `clamp(320px, 34vw, 460px)`, image is top-anchored (`object-position: top`) so
+  subjects framed toward the top of the photo stay visible. Per-page tuning via
+  a slug class, e.g. `.dlf-hero--banner-contact-us { object-position: 50% 15% }`.
+  To give another page this style instead of the tall hero, add its slug to the
+  `$short_hero` list in `page.php` (and to the transparent-header filter in
+  `functions.php`).
+
+### Creating a new page with the short (Donate-style) hero
+
+New pages default to the **tall parallax hero**. To give a new page the shorter,
+static Donate/Contact-style banner instead, there's a one-line-in-two-files code
+step, because the short hero is gated by page **slug** (kept in code so it can't
+silently drift):
+
+1. **Create the page** in wp-admin (Pages → Add New), write its content, and set
+   its **Featured Image** — that image becomes the banner. Note the page's
+   **slug** (Permalink, e.g. `get-involved`).
+2. In **`page.php`**, add the slug to the `$short_hero` list:
+   ```php
+   $short_hero = in_array( $slug, array( 'donate', 'contact-us', 'get-involved' ), true );
+   ```
+3. In **`functions.php`**, add the same slug to the transparent-header filter so
+   the white nav sits over the banner:
+   ```php
+   || is_page( array( 'donate', 'contact-us', 'get-involved' ) )
+   ```
+4. (Optional) Fine-tune the crop for that image with a per-page rule in
+   `site.css`, e.g. `.dlf-hero--banner-get-involved .dlf-hero__img {
+   object-position: 50% 20%; }`. The slug class is emitted automatically.
+
+Deploy the theme (`git pull` on the server) after the code edits. The page
+content and Featured Image are pure wp-admin; only the hero *style* needs the
+two-line code change. (If Donate-style pages become common, this could be
+switched to an editor-selectable page template — not currently wired that way.)
+
+### Mid-page full-bleed parallax section (`.dlf-section-hero`)
+
+A 100vh full-bleed image band with an overlaid title, dropped **into page
+content** (the About page's "Our Origin"). Paste into a **Custom HTML block**:
+
+```html
+<section class="dlf-section-hero">
+  <img src="https://your-site/wp-content/uploads/your-photo.jpg" alt="">
+  <h2 class="dlf-section-hero__title">Our Origin</h2>
+</section>
+```
+
+- It uses the full-bleed breakout automatically. By default the image does a
+  scroll-linked `view()` **drift**; if JS runs, `homepage-parallax.js` upgrades
+  it to a **viewport-fixed background reveal** (the section scrolls over a
+  pinned photo like a window). No URL config needed — the script copies the
+  `<img>`'s own `src` into a CSS variable, so swapping the photo in the editor
+  Just Works.
+- Respects `prefers-reduced-motion` (falls back to a normal scrolling image).
+
+### Full-bleed photo bands in content (`.dlf-content-photo`)
+
+A plain full-width photo band (no title). Three flavors, all via a wrapper class
+on the block:
+
+- `dlf-content-photo` — static full-width photo (max-height 70vh).
+- `dlf-content-photo dlf-content-photo--parallax` — adds the scroll drift.
+- `dlf-content-photo dlf-content-photo--silhouette` — the viewport-fixed
+  background reveal (the homepage silhouette), same JS mechanism as the section
+  hero.
+
+⚠️ **Full-bleed caveat on static pages:** `.dlf-content-photo` only spans edge-
+to-edge on the **homepage**, because that template doesn't wrap content in the
+960px column. On a `page.php` static page it would be capped at 960px — for a
+full-viewport band there, use `.dlf-section-hero` (which includes the breakout)
+or add the breakout rules yourself. These bands were authored as **Kadence Row
+Layout + Image blocks**; the `--silhouette` fixed-bg targets Kadence's
+`.kt-inside-inner-col` wrapper, so keep that structure if you rebuild them.
+
+### Reusable content components (Custom HTML blocks)
+
+All defined in `site.css`, all editor-pasteable:
+
+- **Core-values circle row** — `<div class="dlf-values-grid">` of `<img>`s
+  (5-up desktop, 3-up mobile; images auto-circled).
+- **Team / fellow headshot grid** — `<div class="dlf-team-grid">` of
+  `<div class="dlf-team-member"><img…><p>Name</p></div>` (4-up, square crops).
+- **FAQ accordion** — native `<details class="dlf-faq-item"><summary>…</summary>
+  <p>…</p></details>`, grouped under `<h3 class="dlf-faq-category">`. No JS.
+- **External-links row** — `<div class="dlf-external-links">` of `<a>`s.
+- **Captioned photo** — `<figure class="dlf-page-photo"><img…>
+  <figcaption>…</figcaption></figure>`.
+- **Pull-quote** and **outlined pill button** — homepage patterns; see the
+  `/* ---- Pull-quote ---- */` and `/* ---- Outlined pill button ---- */`
+  sections in `site.css`.
+
+### Global type & motion conventions (gotchas)
+
+- **Fonts** come from Than's Adobe Fonts kit (enqueued in `functions.php`);
+  Kadence's Customizer can't reference it, so base `font-family` lives in
+  `site.css`. Body copy is **weight 300** on purpose.
+- **`strong`/`b` are pinned to 700** — the UA default `bolder` maps 300→400
+  (not 700), so bold text looked non-bold until this was set explicitly.
+- **Body `letter-spacing: .015em`** (≈0.27px at the 18px body) matches the live
+  site's tracking, cascading to all paragraphs/list items.
+- **Titles are uppercase** and use the heading font; hero/section titles cap
+  around **49px** to match the live site.
+- Every parallax/fixed-bg effect is **gated by `prefers-reduced-motion`** and
+  degrades to a static image — preserve those fallbacks when editing.
+
+### Adding a fellow
+
+Fellows are a custom post type (**Fellows** in the wp-admin menu, groups icon),
+registered by the `dlf-model` **mu-plugin** in the `uva-csc/dlf-wordpress`
+monorepo — not by this theme. This theme only provides the templates that
+display them (`archive-fellow.php`, `single-fellow.php`, `taxonomy.php`) and the
+archive facet JS. So the data model must be present on the site for any of this
+to work; adding a fellow itself is pure wp-admin:
+
+1. **Fellows → Add New.**
+2. **Title** = the fellow's full name.
+3. **Featured Image** = the headshot (this is what the cards, modal, and profile
+   page all use — there is no separate photo field). Roughly square crops look
+   best in the grid.
+4. **Taxonomies** (boxes in the sidebar):
+   - **Fellowship Years** — the cohort year (e.g. `2026`). One per fellow.
+   - **Regions** — one or more world regions. Can be multi-valued.
+   - **Countries** — one or more countries. Can be multi-valued.
+   - Add a new term by typing it if it doesn't exist yet; the archive filters
+     pick up new terms automatically.
+5. **Fellow fields** (below the editor):
+   - **Leadership Vision** (ACF) — optional; leave blank to omit that section on
+     the profile.
+   - **Project Description** (ACF) — the main project write-up.
+   - **Learn More Links** ("Learn More Links" metabox) — a mini-repeater: click
+     **+ Add Link**, fill **Link Text** + **URL** for each external link.
+6. The main **editor/body** is available but the profile page is driven by the
+   fields above; use the body only if you intend to show long-form content there.
+7. **Publish.** The fellow appears on `/fellows/` (archive grid + filters +
+   modal) and at its own `/fellow/<slug>/` profile page immediately.
+
+Bulk imports (the original 263-fellow load) are done differently — via a WXR
+generated by the monorepo's `scripts/` pipeline — but for adding fellows
+one at a time, the wp-admin flow above is all you need.
+
+### Where the moving parts live
+
+- `assets/css/site.css` — all component styles, with a searchable quick-index at
+  the top and a `/* ---- ---- */` banner per section.
+- `assets/js/homepage-parallax.js` — the fixed-background reveal enhancer
+  (`.dlf-section-hero` and `.dlf-content-photo--silhouette`).
+- `assets/js/fellows-archive.js` — the fellows archive facet filtering + modal.
+- `page.php` / `front-page.php` — the hero chrome and content wrappers described
+  above; `functions.php` — asset enqueues, image sizes, and the transparent-
+  header filter.
