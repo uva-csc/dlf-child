@@ -100,6 +100,11 @@ body {
 	font-weight: 300; /* body copy is intentionally light -- matches the live site */
 	font-size: 18px;
 	line-height: 1.8;
+	/* Matches the live site, which declares letter-spacing:.015em on <body>;
+	   at the 18px body size that computes to 0.27px, cascading to paragraphs
+	   and list items. Components that need different tracking (hero titles,
+	   uppercase labels) set their own explicitly and are unaffected. */
+	letter-spacing: 0.015em;
 	color: var(--dlf-text);
 	background: var(--dlf-bg);
 }
