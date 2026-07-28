@@ -1215,6 +1215,18 @@ img {
 	font-weight: 700;
 }
 
+.dlf-plain-page__inner .dlf-title-band-sub {
+	display: block;
+	width: 100%;
+	text-align: center;
+	font-weight: 400;
+	font-size: 1.5rem;
+	text-transform: capitalize!important;
+	margin-top: 3rem;
+	margin-bottom: -3rem;
+}
+
+
 .dlf-plain-page__inner .dlf-section-subhead {
 	font-family: var(--dlf-font-heading);
 	font-size: clamp(1.5rem, 3vw, 2.25rem);   /* ~36px */
