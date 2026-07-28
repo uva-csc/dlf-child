@@ -134,46 +134,43 @@ content — they come from the page's **Featured Image**:
 - **Full-height sticky + parallax-drift hero** (`.dlf-hero--home`): the homepage
   and the About / Apply / The-Fellowship pages. The photo pins full-viewport and
   the content panel rides up over it as you scroll, with a subtle image drift.
-  A page gets this automatically as long as it uses `page.php` and is **not**
-  Donate/Contact. Set the page's Featured Image and enable Kadence's Transparent
-  Header (so the white logo/nav sit over the photo).
-- **Short static banner** (`.dlf-hero--banner`): Donate + Contact only.
-  `page.php` branches on slug to render a shorter, non-parallax banner matching
-  the live site's SquareSpace page banner. Height is
-  `clamp(320px, 34vw, 460px)`, image is top-anchored (`object-position: top`) so
-  subjects framed toward the top of the photo stay visible. Per-page tuning via
-  a slug class, e.g. `.dlf-hero--banner-contact-us { object-position: 50% 15% }`.
-  To give another page this style instead of the tall hero, add its slug to the
-  `$short_hero` list in `page.php` (and to the transparent-header filter in
-  `functions.php`).
+  A page gets this by default (the "Page Hero" setting is "Tall parallax hero").
+  Set the page's Featured Image and enable Kadence's Transparent Header (so the
+  white logo/nav sit over the photo).
+- **Short static banner** (`.dlf-hero--banner`): any page whose **"Page Hero"**
+  setting is "Short banner (like Donate)" — Donate + Contact ship this way. A
+  shorter, non-parallax banner matching the live site's SquareSpace page banner:
+  height `clamp(320px, 34vw, 460px)`, image top-anchored (`object-position: top`)
+  so subjects framed toward the top stay visible. Per-page crop tuning via a slug
+  class, e.g. `.dlf-hero--banner-contact-us { object-position: 50% 15% }`.
+  Switching a page to this style is a no-code editor setting — see **Creating a
+  new page with the short (Donate-style) hero** below.
 
 ### Creating a new page with the short (Donate-style) hero
 
-New pages default to the **tall parallax hero**. To give a new page the shorter,
-static Donate/Contact-style banner instead, there's a one-line-in-two-files code
-step, because the short hero is gated by page **slug** (kept in code so it can't
-silently drift):
+New pages default to the **tall parallax hero**. Switching a page to the shorter,
+static Donate/Contact-style banner is a **per-page editor setting — no code**:
 
-1. **Create the page** in wp-admin (Pages → Add New), write its content, and set
-   its **Featured Image** — that image becomes the banner. Note the page's
-   **slug** (Permalink, e.g. `get-involved`).
-2. In **`page.php`**, add the slug to the `$short_hero` list:
-   ```php
-   $short_hero = in_array( $slug, array( 'donate', 'contact-us', 'get-involved' ), true );
-   ```
-3. In **`functions.php`**, add the same slug to the transparent-header filter so
-   the white nav sits over the banner:
-   ```php
-   || is_page( array( 'donate', 'contact-us', 'get-involved' ) )
-   ```
-4. (Optional) Fine-tune the crop for that image with a per-page rule in
-   `site.css`, e.g. `.dlf-hero--banner-get-involved .dlf-hero__img {
-   object-position: 50% 20%; }`. The slug class is emitted automatically.
+1. **Create the page** in wp-admin (Pages → Add New) and write its content.
+2. Set the page's **Featured Image** — that image becomes the banner photo.
+3. In the **"Page Hero"** box in the editor sidebar, choose **"Short banner
+   (like Donate)"** (the default is "Tall parallax hero"). Update/Publish.
 
-Deploy the theme (`git pull` on the server) after the code edits. The page
-content and Featured Image are pure wp-admin; only the hero *style* needs the
-two-line code change. (If Donate-style pages become common, this could be
-switched to an editor-selectable page template — not currently wired that way.)
+That's it — the page renders the short banner and gets the white nav-over-photo
+transparent header automatically. The control is a metabox wired up in
+`functions/page-hero.php`; the choice is stored in the page's `_dlf_hero_style`
+post meta, which `page.php` and the transparent-header filter in `functions.php`
+both read.
+
+*Optional per-image crop tuning (code):* the banner emits a slug class, so you
+can fine-tune a specific photo's framing in `site.css`, e.g.
+`.dlf-hero--banner-get-involved .dlf-hero__img { object-position: 50% 20%; }`.
+Purely cosmetic; the hero itself needs no code.
+
+> **Deploy note:** the setting lives in post meta (the database), so like all
+> content it travels with the DB migration (UpdraftPlus), not the theme repo.
+> A page set to "Short banner" on ddev must have the same setting on the server
+> — re-select it there, or let the DB migration carry it.
 
 ### Mid-page full-bleed parallax section (`.dlf-section-hero`)
 

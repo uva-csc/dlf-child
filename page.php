@@ -22,10 +22,12 @@ while ( have_posts() ) :
 		$hero_image = get_stylesheet_directory_uri() . '/assets/images/fellows-banner.jpg';
 	}
 
-	// Donate + Contact use the short static banner instead of the full-height
-	// sticky parallax hero, to match the live site (dalailamafellows.com).
+	// Hero style is a per-page editor setting ("Page Hero" metabox, stored in
+	// post meta -- see functions/page-hero.php). "short" renders the static
+	// banner used on Donate/Contact (matching the live site); the default
+	// "tall" renders the full-height sticky parallax hero below.
 	$slug       = get_post_field( 'post_name' );
-	$short_hero = in_array( $slug, array( 'donate', 'contact-us' ), true );
+	$short_hero = dlf_page_hero_is_short( get_the_ID() );
 
 	if ( $short_hero ) :
 		// Per-page class (e.g. dlf-hero--banner-contact-us) lets site.css tune

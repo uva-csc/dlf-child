@@ -11,6 +11,7 @@
  */
 
 require get_stylesheet_directory() . '/functions/card-grid.php';
+require get_stylesheet_directory() . '/functions/page-hero.php';
 
 add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style(
@@ -73,26 +74,26 @@ add_action( 'after_setup_theme', function () {
 /**
  * Force Kadence's Transparent Header on the views that use the .dlf-hero--page
  * banner: the fellow views (archive-fellow.php / single-fellow.php /
- * taxonomy.php) and the two short-banner static pages, Donate + Contact
- * (page.php). Their banner image is meant to sit UNDER the header -- so it runs
- * full-bleed to the top and the white logo/nav overlay it -- not below a solid
- * white header bar (on which the white logo is invisible). Kadence assembles
- * the per-view layout (including the 'transparent' key) and exposes it via the
- * `kadence_post_layout` filter; the transparent-header styling itself is
- * already configured in the Customizer for the rest of the site, so we only
- * need to flip it on for these views. Done in code (not a Customizer toggle)
- * so it's version-controlled and can't silently drift.
+ * taxonomy.php) and any page whose "Page Hero" setting is the short banner
+ * (page.php -- see functions/page-hero.php). Their banner image is meant to sit
+ * UNDER the header -- so it runs full-bleed to the top and the white logo/nav
+ * overlay it -- not below a solid white header bar (on which the white logo is
+ * invisible). Kadence assembles the per-view layout (including the 'transparent'
+ * key) and exposes it via the `kadence_post_layout` filter; the transparent-
+ * header styling itself is already configured in the Customizer for the rest of
+ * the site, so we only need to flip it on for these views. Done in code (not a
+ * Customizer toggle) so it's version-controlled and can't silently drift.
  *
- * The other static pages (About, Apply, The Fellowship) use the full-height
- * .dlf-hero--home hero and still get their transparent header from the per-page
- * Customizer setting, not this filter.
+ * The full-height .dlf-hero--home pages (About, Apply, The Fellowship, and any
+ * page left on the default "Tall parallax hero" setting) still get their
+ * transparent header from the per-page Customizer setting, not this filter.
  */
 add_filter( 'kadence_post_layout', function ( $layout ) {
 	if (
 		is_post_type_archive( 'fellow' )
 		|| is_singular( 'fellow' )
 		|| is_tax( array( 'fellowship_year', 'region', 'country' ) )
-		|| is_page( array( 'donate', 'contact-us' ) )
+		|| ( is_page() && dlf_page_hero_is_short( get_queried_object_id() ) )
 	) {
 		$layout['transparent'] = 'enable';
 	}
