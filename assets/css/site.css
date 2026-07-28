@@ -276,6 +276,29 @@ img {
 	height: 320px;
 }
 
+/* Donate + Contact page banners (page.php short-hero branch). A touch taller
+   than the fellows banner, and TOP-anchored: Than's recropped hero images
+   (hero-donate-cropped.jpg / hero-contact-us-cropped.jpg, 2411x1067, subjects
+   framed toward the top) show their top edge, letting the bottom crop off
+   rather than the people. Height scales with viewport but is capped so it
+   stays a "regular" banner, not a full-screen hero. */
+.dlf-hero--banner {
+	height: clamp(320px, 34vw, 460px);
+}
+.dlf-hero--banner .dlf-hero__img {
+	height: 100%;          /* no drift headroom — this banner is static */
+	object-position: top;  /* keep the top of the photo; crop the bottom */
+}
+
+/* Contact banner only: nudge the crop window 15% down the photo (past the
+   wall/ceiling above the group's heads) so the heads sit nearer the top and
+   the front row's legs aren't cropped as hard. 15% was tuned by eye against
+   this specific image; raise it to push heads higher, lower it toward the top.
+   Donate stays top-anchored (no override). */
+.dlf-hero--banner-contact-us .dlf-hero__img {
+	object-position: 50% 15%;
+}
+
 .dlf-hero__img {
 	position: absolute;
 	inset: 0; /* top: 0 -- box is top-aligned at rest, all 18% overflow hangs below (see the drift keyframes for why) */
@@ -370,6 +393,14 @@ img {
 	z-index: 1;
 	background: var(--dlf-bg);
 	box-shadow: 0 -30px 60px rgba(0,0,0,.15);
+}
+
+/* Donate + Contact (page.php short-banner branch): the content sits flush
+   BELOW a static .dlf-hero--page banner rather than riding up over a sticky
+   hero, so drop the overlap shadow that would otherwise smudge the banner's
+   bottom edge. */
+.dlf-front-panel--flat {
+	box-shadow: none;
 }
 
 /* ---- Mission section ---- */

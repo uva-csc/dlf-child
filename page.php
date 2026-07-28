@@ -1,12 +1,17 @@
 <?php
 /**
  * Generic page template (about, apply, the-fellowship, donate, contact-us).
- * Ported from the dlf theme for Sprint K1 -- every one of these pages has
- * its own full-height hero photo (sticky + scroll-drift), hero photo from
- * each page's featured image. get_header()/get_footer() now render
- * Kadence's Header/Footer Builder output instead of our own parts/header.php
- * -- the transparent-nav-over-hero look is a Kadence "Transparent Header"
- * Customizer setting (configured per-page), not markup here.
+ * Ported from the dlf theme for Sprint K1. get_header()/get_footer() render
+ * Kadence's Header/Footer Builder output; the transparent-nav-over-hero look
+ * is Kadence's "Transparent Header" (enabled per-view -- see functions.php's
+ * kadence_post_layout filter for donate/contact-us, Customizer for the rest).
+ *
+ * Two hero styles:
+ *  - Most pages get a full-height sticky hero with scroll-drift parallax
+ *    (.dlf-hero--home), hero photo from the page's featured image.
+ *  - Donate + Contact match the live site's smaller SquareSpace page-banner:
+ *    a short, static banner (.dlf-hero--page, no sticky, no parallax), the
+ *    same variant the fellows archive/single pages use.
  */
 get_header();
 
@@ -16,20 +21,44 @@ while ( have_posts() ) :
 	if ( ! $hero_image ) {
 		$hero_image = get_stylesheet_directory_uri() . '/assets/images/fellows-banner.jpg';
 	}
-	?>
 
-	<div class="dlf-hero-scroll">
-		<div class="dlf-hero dlf-hero--home">
+	// Donate + Contact use the short static banner instead of the full-height
+	// sticky parallax hero, to match the live site (dalailamafellows.com).
+	$slug       = get_post_field( 'post_name' );
+	$short_hero = in_array( $slug, array( 'donate', 'contact-us' ), true );
+
+	if ( $short_hero ) :
+		// Per-page class (e.g. dlf-hero--banner-contact-us) lets site.css tune
+		// the crop position per banner image without touching the others.
+		?>
+
+		<div class="dlf-hero dlf-hero--page dlf-hero--banner dlf-hero--banner-<?php echo esc_attr( $slug ); ?>">
 			<img class="dlf-hero__img" src="<?php echo esc_url( $hero_image ); ?>" alt="" aria-hidden="true">
 			<h1 class="dlf-hero__title"><?php the_title(); ?></h1>
 		</div>
 
-		<main class="dlf-front-panel">
+		<main class="dlf-front-panel dlf-front-panel--flat">
 			<div class="dlf-plain-page__inner">
 				<?php the_content(); ?>
 			</div>
 		</main>
-	</div>
+
+	<?php else : ?>
+
+		<div class="dlf-hero-scroll">
+			<div class="dlf-hero dlf-hero--home">
+				<img class="dlf-hero__img" src="<?php echo esc_url( $hero_image ); ?>" alt="" aria-hidden="true">
+				<h1 class="dlf-hero__title"><?php the_title(); ?></h1>
+			</div>
+
+			<main class="dlf-front-panel">
+				<div class="dlf-plain-page__inner">
+					<?php the_content(); ?>
+				</div>
+			</main>
+		</div>
+
+	<?php endif; ?>
 
 <?php endwhile; ?>
 
