@@ -213,20 +213,71 @@ Layout + Image blocks**; the `--silhouette` fixed-bg targets Kadence's
 
 ### Reusable content components (Custom HTML blocks)
 
-All defined in `site.css`, all editor-pasteable:
+Each of these is styled by a class in `site.css` — paste the markup into a
+**Custom HTML block** and it picks up the styling. The snippets below are the
+minimum structure; repeat the inner items as needed.
 
-- **Core-values circle row** — `<div class="dlf-values-grid">` of `<img>`s
-  (5-up desktop, 3-up mobile; images auto-circled).
-- **Team / fellow headshot grid** — `<div class="dlf-team-grid">` of
-  `<div class="dlf-team-member"><img…><p>Name</p></div>` (4-up, square crops).
-- **FAQ accordion** — native `<details class="dlf-faq-item"><summary>…</summary>
-  <p>…</p></details>`, grouped under `<h3 class="dlf-faq-category">`. No JS.
-- **External-links row** — `<div class="dlf-external-links">` of `<a>`s.
-- **Captioned photo** — `<figure class="dlf-page-photo"><img…>
-  <figcaption>…</figcaption></figure>`.
-- **Pull-quote** and **outlined pill button** — homepage patterns; see the
-  `/* ---- Pull-quote ---- */` and `/* ---- Outlined pill button ---- */`
-  sections in `site.css`.
+**Core-values circle row** — 5-up on desktop, 3-up on mobile; images are
+auto-circled.
+
+```html
+<div class="dlf-values-grid">
+  <img src="…" alt="Integrity">
+  <img src="…" alt="Interdependence">
+  <!-- …five total… -->
+</div>
+```
+
+**Team / fellow headshot grid** — 4 per row, square crops, name under each.
+
+```html
+<div class="dlf-team-grid">
+  <div class="dlf-team-member">
+    <img src="…" alt="Jane Doe">
+    <p>Jane Doe</p>
+  </div>
+  <!-- …repeat per person… -->
+</div>
+```
+
+**FAQ accordion** — native `details`/`summary`, no JS. Group items under a
+category heading.
+
+```html
+<h3 class="dlf-faq-category">Eligibility</h3>
+
+<details class="dlf-faq-item">
+  <summary>Who can apply?</summary>
+  <p>Answer text here.</p>
+</details>
+
+<details class="dlf-faq-item">
+  <summary>Is there an age limit?</summary>
+  <p>Answer text here.</p>
+</details>
+```
+
+**External-links row** — a horizontal row of plain links.
+
+```html
+<div class="dlf-external-links">
+  <a href="…">Application portal</a>
+  <a href="…">Guidelines (PDF)</a>
+</div>
+```
+
+**Captioned photo** — image with optional small italic caption.
+
+```html
+<figure class="dlf-page-photo">
+  <img src="…" alt="…">
+  <figcaption>Countries our Fellows come from.</figcaption>
+</figure>
+```
+
+**Pull-quote** and **outlined pill button** are homepage patterns — see the
+`/* ---- Pull-quote ---- */` and `/* ---- Outlined pill button ---- */` sections
+in `site.css` for their markup.
 
 ### Global type & motion conventions (gotchas)
 
