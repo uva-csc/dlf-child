@@ -1226,6 +1226,12 @@ img {
 	margin-bottom: -3rem;
 }
 
+.dlf-plain-page__inner .dlf-title-band.faq ~ h3 {
+	text-transform: uppercase;
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
 
 .dlf-plain-page__inner .dlf-section-subhead {
 	font-family: var(--dlf-font-heading);
