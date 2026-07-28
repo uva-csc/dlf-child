@@ -201,6 +201,7 @@ img {
 	margin: 0 auto 3rem;
 	display: grid;
 	grid-template-columns: repeat(2, minmax(180px, 260px));
+	justify-content: center; /* center the two tracks within the (now full-width) footer -- without this they pack to the left */
 	gap: 2.5rem;
 	text-align: left;
 }
@@ -236,9 +237,28 @@ img {
 }
 
 .dlf-footer-logos img {
-	max-width: 400px;
+	max-width: 800px; /* the source (boulder-csc-logos.png) is 800x300 -- show it at native size, matching the live site */
 	width: 100%;
 	height: auto;
+}
+
+/* Let the DLF footer use the full footer width.
+   The entire footer is a single Custom HTML widget that Kadence places in the
+   MIDDLE section of a 3-column footer row (a CSS grid, grid-template-columns:
+   repeat(3, 1fr)). By default the widget is boxed into the middle third -- which
+   capped the logo lockup at ~394px. The other two sections are empty. Force the
+   row to a single full-width column and hide the empty sections so the widget
+   spans the whole footer. !important is used deliberately to override Kadence's
+   per-breakpoint grid-template-columns rules in one place instead of restating
+   each media-query variant. The widget lives in middle section 2 -- see the
+   footer_items theme_mod. (Handled in CSS because Kadence's footer-row column
+   count wasn't reliably settable per-site via the Customizer here.) */
+.site-middle-footer-inner-wrap.site-footer-row {
+	grid-template-columns: minmax(0, 1fr) !important;
+}
+.site-middle-footer-inner-wrap .site-footer-middle-section-1,
+.site-middle-footer-inner-wrap .site-footer-middle-section-3 {
+	display: none;
 }
 
 /* ---- Homepage hero (accessible sticky + scroll-driven drift, Spike E) ---- */
