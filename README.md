@@ -30,35 +30,31 @@ needs:
    taxonomies, and the `dlf/v1/fellows` REST endpoint that this theme's
    templates and archive JS depend on. They live in the
    [`uva-csc/dlf-wordpress`](https://github.com/uva-csc/dlf-wordpress) monorepo
-   under `web/wp-content/mu-plugins/`, and are deployed to the server via the
-   UpdraftPlus backup/restore flow — **not** part of this theme repo.
+   under `web/wp-content/mu-plugins/`, and are deployed separately — **not**
+   part of this theme repo.
 5. **ACF (free)** — the two fellow text fields use ACF local field groups
    (registered by the mu-plugin above).
 
 ## Deploying to the WordPress site
 
-This repo is **public**, so the server can clone it over HTTPS with no
-credentials, deploy keys, or tokens. Two supported paths — pick one at deploy
-time.
+This repo is **public**, so it can be cloned over HTTPS with no credentials,
+deploy keys, or tokens. Two supported paths — pick one at deploy time.
 
 ### A. Git clone/pull over HTTPS (recommended)
 
-The host (a2hosted / hosting.com) has SSH + WP-CLI. Deploy the theme as a
-checkout of this repo directly into `wp-content/themes`:
+If the host has shell access, deploy the theme as a checkout of this repo in
+`wp-content/themes`:
 
 ```bash
 cd wp-content/themes
-# first time — replace the restored theme dir with a git checkout
-mv dlf-child dlf-child.bak            # keep the restore as a backup
 git clone https://github.com/uva-csc/dlf-child.git dlf-child
 # updates thereafter
 cd dlf-child && git pull
 ```
 
-The server's current `dlf-child` dir came from an UpdraftPlus restore, so the
-first switch to git-deploy means replacing that directory with a clone. Once
-switched, updating the theme is just `git pull` in `wp-content/themes/dlf-child`
-— no re-upload, no re-zip.
+If a `dlf-child` directory already exists there, move it aside first (e.g.
+`mv dlf-child dlf-child.bak`) so the clone lands cleanly. Once switched to a
+git checkout, updating the theme is just `git pull` — no re-upload, no re-zip.
 
 ### B. ZIP upload via wp-admin (fallback)
 
