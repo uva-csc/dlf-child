@@ -37,24 +37,28 @@ needs:
 
 ## Deploying to the WordPress site
 
-Two supported paths. Pick one at deploy time.
+This repo is **public**, so the server can clone it over HTTPS with no
+credentials, deploy keys, or tokens. Two supported paths — pick one at deploy
+time.
 
-### A. Git clone/pull over SSH (recommended)
+### A. Git clone/pull over HTTPS (recommended)
 
 The host (a2hosted / hosting.com) has SSH + WP-CLI. Deploy the theme as a
-checkout of this repo:
+checkout of this repo directly into `wp-content/themes`:
 
 ```bash
 cd wp-content/themes
 # first time — replace the restored theme dir with a git checkout
 mv dlf-child dlf-child.bak            # keep the restore as a backup
-git clone git@github.com:uva-csc/dlf-child.git dlf-child
+git clone https://github.com/uva-csc/dlf-child.git dlf-child
 # updates thereafter
 cd dlf-child && git pull
 ```
 
 The server's current `dlf-child` dir came from an UpdraftPlus restore, so the
-first switch to git-deploy means replacing that directory with a clone.
+first switch to git-deploy means replacing that directory with a clone. Once
+switched, updating the theme is just `git pull` in `wp-content/themes/dlf-child`
+— no re-upload, no re-zip.
 
 ### B. ZIP upload via wp-admin (fallback)
 
@@ -71,7 +75,7 @@ repo into place:
 
 ```bash
 cd web/wp-content/themes
-git clone git@github.com:uva-csc/dlf-child.git dlf-child
+git clone https://github.com/uva-csc/dlf-child.git dlf-child
 ```
 
 ## Docs
