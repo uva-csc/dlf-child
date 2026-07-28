@@ -244,20 +244,25 @@ img {
 
 /* Let the DLF footer use the full footer width.
    The entire footer is a single Custom HTML widget that Kadence places in the
-   MIDDLE section of a 3-column footer row (a CSS grid, grid-template-columns:
-   repeat(3, 1fr)). By default the widget is boxed into the middle third -- which
-   capped the logo lockup at ~394px. The other two sections are empty. Force the
-   row to a single full-width column and hide the empty sections so the widget
-   spans the whole footer. !important is used deliberately to override Kadence's
-   per-breakpoint grid-template-columns rules in one place instead of restating
-   each media-query variant. The widget lives in middle section 2 -- see the
-   footer_items theme_mod. (Handled in CSS because Kadence's footer-row column
-   count wasn't reliably settable per-site via the Customizer here.) */
+   footer's MIDDLE row. Depending on how that row's columns are configured (a
+   Kadence theme_mod that differs per environment -- e.g. 3 equal columns with
+   the widget in the middle on local, but a single column on the dev server),
+   the row is a CSS grid that can box the widget into a fraction of the width --
+   which capped the logo lockup at ~394px.
+
+   Two environment-independent rules fix it:
+     1. Collapse the row to ONE full-width track (overriding Kadence's
+        per-breakpoint grid-template-columns in one place -- hence !important).
+        With a single track, whichever section holds the widget fills the row.
+     2. Hide only genuinely EMPTY sections, keyed to Kadence's
+        `footer-section-inner-items-0` marker -- NOT by section number. (An
+        earlier version hid sections 1 and 3 by number; that worked on local,
+        where the widget sat in section 2, but HID THE WHOLE FOOTER on the dev
+        server, where the widget sits in section 1.) */
 .site-middle-footer-inner-wrap.site-footer-row {
 	grid-template-columns: minmax(0, 1fr) !important;
 }
-.site-middle-footer-inner-wrap .site-footer-middle-section-1,
-.site-middle-footer-inner-wrap .site-footer-middle-section-3 {
+.site-middle-footer-inner-wrap .site-footer-section.footer-section-inner-items-0 {
 	display: none;
 }
 
