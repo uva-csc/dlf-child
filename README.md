@@ -56,6 +56,19 @@ If a `dlf-child` directory already exists there, move it aside first (e.g.
 `mv dlf-child dlf-child.bak`) so the clone lands cleanly. Once switched to a
 git checkout, updating the theme is just `git pull` — no re-upload, no re-zip.
 
+**Pin to a release (recommended for production).** `git pull` on `main` tracks
+the latest commit; to pin production to a tagged release instead, check out the
+tag:
+
+```bash
+cd wp-content/themes/dlf-child
+git fetch --tags
+git checkout v1.0.0          # a specific release; `git checkout main` returns to latest
+```
+
+Releases are listed at https://github.com/uva-csc/dlf-child/releases. To move to
+a newer release later, `git fetch --tags && git checkout vX.Y.Z`.
+
 ### B. ZIP upload via wp-admin (fallback)
 
 GitHub → **Code → Download ZIP**, then wp-admin → **Appearance → Themes →
