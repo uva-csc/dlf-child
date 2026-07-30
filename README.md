@@ -24,16 +24,16 @@ needs:
    Creative Cloud account) — enqueued in `functions.php`. Supplies the site's
    Futura PT / Proxima Nova. The kit's allowed-domains list must include the
    site's hostname or the fonts won't load.
-4. **The `dlf` data model (mu-plugins)** — `dlf-model.php`, `dlf-rest.php`,
-   `dlf-acf-fields.php`, `dlf-learn-more.php`, `dlf-redirects.php`. These define
-   the `fellow` custom post type, the `fellowship_year` / `region` / `country`
-   taxonomies, and the `dlf/v1/fellows` REST endpoint that this theme's
-   templates and archive JS depend on. They live in the
-   [`uva-csc/dlf-wordpress`](https://github.com/uva-csc/dlf-wordpress) monorepo
-   under `web/wp-content/mu-plugins/`, and are deployed separately — **not**
-   part of this theme repo.
+4. **The DLF Core plugin** —
+   [`uva-csc/dlf-plugin`](https://github.com/uva-csc/dlf-plugin). It defines the
+   `fellow` custom post type, the `fellowship_year` / `region` / `country`
+   taxonomies, and the `dlf/v1/fellows` REST endpoint that this theme's templates
+   and archive JS depend on (plus the editing UI and region auto-derivation).
+   Install it as a normal plugin — deployed separately, **not** part of this
+   theme repo. (It was previously a set of mu-plugins in the `dlf-wordpress`
+   monorepo; consolidated into its own plugin repo 2026-07-29.)
 5. **ACF (free)** — the two fellow text fields use ACF local field groups
-   (registered by the mu-plugin above).
+   (registered by the DLF Core plugin above).
 
 ## Deploying to the WordPress site
 
@@ -168,9 +168,9 @@ can fine-tune a specific photo's framing in `site.css`, e.g.
 Purely cosmetic; the hero itself needs no code.
 
 > **Deploy note:** the setting lives in post meta (the database), so like all
-> content it travels with the DB migration (UpdraftPlus), not the theme repo.
-> A page set to "Short banner" on ddev must have the same setting on the server
-> — re-select it there, or let the DB migration carry it.
+> content it travels with the site's database, not the theme repo. A page set to
+> "Short banner" on ddev must have the same setting on the server — re-select it
+> there, or let the database copy carry it.
 
 ### Mid-page full-bleed parallax section (`.dlf-section-hero`)
 
@@ -296,11 +296,12 @@ in `site.css` for their markup.
 ### Adding a fellow
 
 Fellows are a custom post type (**Fellows** in the wp-admin menu, groups icon),
-registered by the `dlf-model` **mu-plugin** in the `uva-csc/dlf-wordpress`
-monorepo — not by this theme. This theme only provides the templates that
-display them (`archive-fellow.php`, `single-fellow.php`, `taxonomy.php`) and the
-archive facet JS. So the data model must be present on the site for any of this
-to work; adding a fellow itself is pure wp-admin:
+registered by the **DLF Core plugin**
+([`uva-csc/dlf-plugin`](https://github.com/uva-csc/dlf-plugin)) — not by this
+theme. This theme only provides the templates that display them
+(`archive-fellow.php`, `single-fellow.php`, `taxonomy.php`) and the archive facet
+JS. So the plugin must be present on the site for any of this to work; adding a
+fellow itself is pure wp-admin:
 
 1. **Fellows → Add New.**
 2. **Title** = the fellow's full name.
@@ -309,18 +310,24 @@ to work; adding a fellow itself is pure wp-admin:
    best in the grid.
 4. **Taxonomies** (boxes in the sidebar):
    - **Fellowship Years** — the cohort year (e.g. `2026`). One per fellow.
-   - **Regions** — one or more world regions. Can be multi-valued.
    - **Countries** — one or more countries. Can be multi-valued.
-   - Add a new term by typing it if it doesn't exist yet; the archive filters
-     pick up new terms automatically.
-5. **Fellow fields** (below the editor):
+   - **Regions are set automatically** — a fellow's region(s) are derived from
+     its countries on save, so there is *no* Regions box on the fellow screen.
+     Each country's region is configured once at **Fellows → Countries** (a
+     Region dropdown on the country's edit screen). See the DLF Core plugin.
+   - Add a new country/year term by typing it if it doesn't exist yet; the
+     archive filters pick up new terms automatically. (A brand-new country added
+     inline has no region until one is assigned on the Countries screen — the
+     plugin shows a reminder.)
+5. **Fellow fields** (under the title, where the body editor used to be):
    - **Leadership Vision** (ACF) — optional; leave blank to omit that section on
      the profile.
    - **Project Description** (ACF) — the main project write-up.
    - **Learn More Links** ("Learn More Links" metabox) — a mini-repeater: click
      **+ Add Link**, fill **Link Text** + **URL** for each external link.
-6. The main **editor/body** is available but the profile page is driven by the
-   fields above; use the body only if you intend to show long-form content there.
+6. There is **no body editor** on the fellow screen (removed by the DLF Core
+   plugin) — the structured fields above are the entire editing surface, and the
+   profile page is built from them.
 7. **Publish.** The fellow appears on `/fellows/` (archive grid + filters +
    modal) and at its own `/fellow/<slug>/` profile page immediately.
 
