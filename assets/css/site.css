@@ -301,6 +301,18 @@ img {
 	height: 100vh;
 }
 
+/* The 118%-tall image box (see .dlf-hero__img) defaults to object-position
+   50% 50%, but how much of the source photo that centering crops off the
+   top depends on the viewport's aspect ratio — wider/shorter screens (e.g.
+   a 16:9 Windows laptop) zoom the cover-fit in more than a MacBook's 16:10
+   panel, clipping the fellows' heads at the top of the photo. Anchoring
+   fully to the top (same pattern as .dlf-hero--banner below) keeps heads
+   intact across aspect ratios and lets the bottom of the photo (floor/rugs)
+   take the crop instead. */
+.dlf-hero--home .dlf-hero__img {
+	object-position: 50% 0%;
+}
+
 /* Short static banner — fellows archive / single-fellow pages. */
 .dlf-hero--page {
 	height: 320px;
