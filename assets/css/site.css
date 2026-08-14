@@ -359,7 +359,8 @@ img {
 	   "Image Overlay" site style on every banner image). Lowered from
 	   .35/.2/.45 in Aug 2026 — stakeholders asked for brighter hero photos,
 	   and the brighter value was kept site-wide rather than homepage-only. */
-	background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.1) 45%, rgba(0,0,0,.25));
+	/* old background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.1) 45%, rgba(0,0,0,.25));*/
+	background: rgba(46,46,46,.3);
 	pointer-events: none;
 }
 
@@ -367,6 +368,7 @@ img {
    LEADERSHIP" on the homepage, or each static page's own title). */
 .dlf-hero__title {
 	position: relative;
+	z-index: 1; /* make the title on top of overlay */
 	color: #fff;
 	font-family: var(--dlf-font-heading);
 	font-weight: 700;
@@ -468,6 +470,10 @@ img {
    the full-amplitude drift it was tuned for. */
 .dlf-hero--home-about .dlf-hero__img {
 	height: 100%;
+}
+
+.dlf-hero--home-about::after {
+	background: rgba(46,46,46,.3);
 }
 
 @supports (animation-timeline: scroll()) {
