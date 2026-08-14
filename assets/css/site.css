@@ -434,34 +434,40 @@ img {
 	}
 }
 
-/* About page: less zoomed-in hero.
+/* About page: hero framed to match the live site exactly.
    ---------------------------------------------------------------------------
    The About hero photo read as noticeably more zoomed/cropped than the same
    shot on the live site (dalailamafellows.com/about). It is NOT an aspect-ratio
    mismatch -- both sources are ~2.97:1. The cause is the drift headroom itself:
-   `object-fit: cover` scales to fill the image box's FULL height, so a
-   118%-tall box is scaled exactly 18% more than the live site's plain
-   100%-tall one. Zoom is therefore directly proportional to the height below --
-   that one number IS the zoom dial, and 100% is the exact live-site match.
+   `object-fit: cover` scales to fill the image box's FULL height, so the shared
+   118%-tall box is scaled exactly 18% more than the live site's plain 100%-tall
+   one. Zoom is therefore directly proportional to the height below -- that one
+   number IS the zoom dial, and `100%` here is the exact live-site match.
 
-   Trading zoom for drift: the drift can only travel as far as the headroom
-   allows, so shrinking the height shortens the parallax too. Pair the two
-   values from this table (max translate = (H - 100) / H, minus a small margin
-   so the drift never overshoots and exposes .dlf-hero's #222 background --
-   see the long gotcha note above the keyframes):
+   Why the drift below still works at 100%, with NO headroom left:
+   `translateY(-8.5%)` does slide the image up off its box, opening an 8.5%-tall
+   strip of .dlf-hero's #222 background at the BOTTOM of the hero -- but on a
+   sticky --home hero that strip is never visible. .dlf-front-panel is opaque
+   (background: var(--dlf-bg)) at z-index 1 and rides up over the hero at
+   z-index 0, and it always covers more than the gap opens: at scroll distance
+   S the panel covers the bottom S of the hero while the gap is only 0.085 x S
+   tall, so the panel outruns it at every scroll position. Net result: live-exact
+   framing at rest AND a real parallax drift, the drift just borrowing its travel
+   from the panel-covered region instead of from zoom headroom.
 
-       height   translateY   notes
-       118%     -14.5%       the shared default (homepage)
-       112%     -10.2%
-       110%      -8.5%       <- current setting here
-       108%      -7.0%
-       105%      -4.5%       barely any drift left
-       100%       0          exact live-site framing, no drift at all
+   Retuning caveats, in order of how easily they bite:
+     - This only holds for sticky --home heroes with a panel scrolling over
+       them. On a static banner (.dlf-hero--banner) the same pairing WOULD
+       expose a visible #222 strip -- there, keep translate inside the headroom.
+     - Raising the height above 100% re-introduces zoom at 1:1 (110% = 10% more
+       zoomed than live). Only do it if more drift travel is worth the zoom.
+     - Deepening the drift past roughly -1/12 of the panel's scroll-in rate
+       would let the gap outrun the panel; -8.5% is nowhere near that bound.
 
    Scoped to the per-page class from page.php so the homepage's own hero keeps
    the full-amplitude drift it was tuned for. */
 .dlf-hero--home-about .dlf-hero__img {
-	height: 110%;
+	height: 100%;
 }
 
 @supports (animation-timeline: scroll()) {
