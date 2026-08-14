@@ -48,7 +48,10 @@ while ( have_posts() ) :
 	<?php else : ?>
 
 		<div class="dlf-hero-scroll">
-			<div class="dlf-hero dlf-hero--home">
+			<?php // Per-page class (e.g. dlf-hero--home-about), same idea as the
+			      // banner branch above: lets site.css tune one page's crop or
+			      // drift without touching the other tall heroes. ?>
+			<div class="dlf-hero dlf-hero--home dlf-hero--home-<?php echo esc_attr( $slug ); ?>">
 				<img class="dlf-hero__img" src="<?php echo esc_url( $hero_image ); ?>" alt="" aria-hidden="true">
 				<h1 class="dlf-hero__title"><?php the_title(); ?></h1>
 			</div>

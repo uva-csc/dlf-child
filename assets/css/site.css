@@ -434,6 +434,50 @@ img {
 	}
 }
 
+/* About page: less zoomed-in hero.
+   ---------------------------------------------------------------------------
+   The About hero photo read as noticeably more zoomed/cropped than the same
+   shot on the live site (dalailamafellows.com/about). It is NOT an aspect-ratio
+   mismatch -- both sources are ~2.97:1. The cause is the drift headroom itself:
+   `object-fit: cover` scales to fill the image box's FULL height, so a
+   118%-tall box is scaled exactly 18% more than the live site's plain
+   100%-tall one. Zoom is therefore directly proportional to the height below --
+   that one number IS the zoom dial, and 100% is the exact live-site match.
+
+   Trading zoom for drift: the drift can only travel as far as the headroom
+   allows, so shrinking the height shortens the parallax too. Pair the two
+   values from this table (max translate = (H - 100) / H, minus a small margin
+   so the drift never overshoots and exposes .dlf-hero's #222 background --
+   see the long gotcha note above the keyframes):
+
+       height   translateY   notes
+       118%     -14.5%       the shared default (homepage)
+       112%     -10.2%
+       110%      -8.5%       <- current setting here
+       108%      -7.0%
+       105%      -4.5%       barely any drift left
+       100%       0          exact live-site framing, no drift at all
+
+   Scoped to the per-page class from page.php so the homepage's own hero keeps
+   the full-amplitude drift it was tuned for. */
+.dlf-hero--home-about .dlf-hero__img {
+	height: 110%;
+}
+
+@supports (animation-timeline: scroll()) {
+	@keyframes dlf-hero-drift-about {
+		from { transform: translateY(0); }
+		to   { transform: translateY(-8.5%); }
+	}
+
+	/* Same specificity as the shared .dlf-hero--home rule, so this must stay
+	   AFTER it in source order to win. Only the name is swapped -- timeline,
+	   range and easing are inherited from that rule's shorthand. */
+	.dlf-hero--home-about .dlf-hero__img {
+		animation-name: dlf-hero-drift-about;
+	}
+}
+
 /* Content panel rides up over the sticky hero */
 .dlf-front-panel {
 	position: relative;
