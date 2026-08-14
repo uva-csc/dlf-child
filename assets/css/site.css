@@ -384,14 +384,58 @@ img {
 	text-shadow: 0 2px 20px rgba(0,0,0,.5);
 }
 
+/* Homepage scroll cue (front-page.php): a chevron that swaps to a "SCROLL
+   DOWN" label on hover, mirroring the live site's `.scroll-arrow`. Live's box
+   is 150x30 at bottom:24px with a 32px icon, and the label is proxima-nova
+   12px / 2px tracking -- reproduced here, except live's is black
+   (.color-weight-light) and ours stays white over the photo.
+
+   The chevron lives in ::before rather than in the markup so :hover can swap
+   the two, exactly as live does (`:hover:before {display:none}` +
+   `:hover span {display:block}`). The 150px width is what gives the label room
+   to sit on one line without shifting the cue off-centre.
+
+   z-index: 1 for the same reason as .dlf-hero__title above -- .dlf-hero::after
+   is the hero's last child, so without it the overlay paints over the cue. */
 .dlf-hero__cue {
 	position: absolute;
+	z-index: 1;
 	bottom: 1.5rem;
 	left: 50%;
 	transform: translateX(-50%);
+	width: 150px;
+	height: 30px;
+	text-align: center;
 	color: #fff;
-	font-size: 1.6rem;
 	opacity: 0.85;
+}
+
+.dlf-hero__cue::before {
+	content: '\2304'; /* the same U+2304 arrowhead the markup used to carry */
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 32px;
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+}
+
+.dlf-hero__cue-label {
+	display: none;
+	font-family: var(--dlf-font-body); /* proxima-nova, same as live */
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 2px;
+	line-height: 30px;
+	text-transform: uppercase;
+}
+
+.dlf-hero__cue:hover::before {
+	display: none;
+}
+
+.dlf-hero__cue:hover .dlf-hero__cue-label {
+	display: block;
 }
 
 /* Drift animation for .dlf-hero--home only, tied to root scroll position
@@ -470,10 +514,6 @@ img {
    the full-amplitude drift it was tuned for. */
 .dlf-hero--home-about .dlf-hero__img {
 	height: 100%;
-}
-
-.dlf-hero--home-about::after {
-	background: rgba(46,46,46,.3);
 }
 
 @supports (animation-timeline: scroll()) {
@@ -1079,7 +1119,10 @@ img {
    added through wp-admin picks up consistent styling automatically. */
 
 .dlf-plain-page__inner h2 {
-	font-size: 1.4rem;
+	/* 24px, matching the live site and the homepage's .dlf-mission__inner h2.
+	   Was 1.4rem (22.4px), which made the static pages' section headings
+	   slightly smaller than the same headings on the homepage. */
+	font-size: 1.5rem;
 	text-transform: uppercase;
 	margin: 2.5rem 0 1rem;
 }
@@ -1088,9 +1131,14 @@ img {
 	margin-top: 0;
 }
 
+/* 22px to match the live site's global h3 (proxima-nova 22px, not uppercase).
+   Was 1.1rem (17.6px). Note live also sets font-weight: 300 and
+   line-height: 2em on h3; ours inherits the 700 from the h1-h4 base rule and
+   is therefore bolder than live -- left alone for now, flagged as a separate
+   decision since it changes every static page's sub-headings. */
 .dlf-plain-page__inner h3 {
 	font-family: var(--dlf-font-body);
-	font-size: 1.1rem;
+	font-size: 1.375rem;
 	text-transform: none;
 	margin: 2rem 0 0.5rem;
 }

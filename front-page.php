@@ -22,7 +22,11 @@ if ( ! $hero_image ) {
 	<div class="dlf-hero dlf-hero--home">
 		<img class="dlf-hero__img" src="<?php echo esc_url( $hero_image ); ?>" alt="" aria-hidden="true">
 		<h1 class="dlf-hero__title"><?php echo get_the_title( $front ); ?></h1>
-		<span class="dlf-hero__cue" aria-hidden="true">&#8964;</span>
+		<?php // Scroll cue: the chevron is drawn by CSS (.dlf-hero__cue::before) so
+		      // that hovering can swap it for the label, the way the live site's
+		      // .scroll-arrow does. Decorative -- the panel below is reachable by
+		      // scrolling, so this is aria-hidden and not a control. ?>
+		<span class="dlf-hero__cue" aria-hidden="true"><span class="dlf-hero__cue-label">Scroll Down</span></span>
 	</div>
 
 	<main class="dlf-front-panel">
