@@ -147,7 +147,7 @@ img {
    this wrapper is defined further down in "Plain content page typography". */
 
 .dlf-plain-page__inner {
-	max-width: 960px;
+	max-width: 1008px;
 	margin: 0 auto;
 	padding: 4rem 1.5rem 6rem;
 }
@@ -1370,7 +1370,7 @@ img {
 	font-size: 1.5rem;
 	text-transform: capitalize!important;
 	margin-top: 3rem;
-	margin-bottom: -3rem;
+	margin-bottom: -3rem;https://dlf.cscwork9.a2hosted.com/apply/
 }
 
 .dlf-plain-page__inner .dlf-title-band.faq ~ h3 {
