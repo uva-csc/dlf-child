@@ -56,6 +56,7 @@ get_header();
 			<label for="dlf-facet-sort">Sort by</label>
 			<select id="dlf-facet-sort" data-facet="sort">
 				<option value="year">Class</option>
+                <option value="firstname" selected>First name</option>
 				<option value="lastname">Last name</option>
 			</select>
 		</div>
@@ -68,11 +69,12 @@ get_header();
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
 		) );
-		// No-JS baseline sort: year (newest first) then last name -- matches
-		// the default of the JS-enhanced view (fellows-archive.js). WP_Query
-		// can't order by a derived "last name", so sort the loaded posts.
+		// No-JS baseline sort: first name (A->Z), then last name as a
+		// tiebreak -- matches the default of the JS-enhanced view
+		// (fellows-archive.js). WP_Query can't order by a derived "first
+		// name", so sort the loaded posts.
 		$sorted = $fellow_query->posts;
-		usort( $sorted, 'dlf_compare_fellows_year_then_name' );
+		usort( $sorted, 'dlf_compare_fellows_firstname' );
 		dlf_render_fellow_card_grid( $sorted );
 		wp_reset_postdata();
 		?>

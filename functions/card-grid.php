@@ -26,6 +26,21 @@ function dlf_fellow_last_name( $post ) {
 }
 
 /**
+ * Regular-expression-based function to extract the first name from a fellow's
+ * title. Same as above but returns the first word.
+ *
+ * @param WP_Post $post
+ * @return string
+ */
+function dlf_fellow_first_name( $post ) {
+    $name = get_the_title( $post );
+    $name = preg_replace( '/\s*\([^)]*\)/u', '', $name );      // drop "(...)"
+    $name = preg_replace( '/["\'\x{2018}\x{2019}\x{201C}\x{201D}]/u', '', $name ); // drop quotes
+    $parts = preg_split( '/\s+/', trim( $name ) );
+    return $parts[0];
+}
+
+/**
  * Fellowship year (cohort) as an int, 0 if unset.
  *
  * @param WP_Post $post
@@ -37,8 +52,9 @@ function dlf_fellow_year( $post ) {
 }
 
 /**
- * usort comparator: year newest-first, then last name A->Z. The default order
- * for the fellows archive (both render paths).
+ * usort comparator: year newest-first, then last name A->Z. Used for the
+ * "Class" sort option; no longer the fellows archive default (see
+ * dlf_compare_fellows_firstname()).
  */
 function dlf_compare_fellows_year_then_name( $a, $b ) {
 	$ya = dlf_fellow_year( $a );
@@ -47,6 +63,15 @@ function dlf_compare_fellows_year_then_name( $a, $b ) {
 		return $yb <=> $ya; // newest first
 	}
 	return strcasecmp( dlf_fellow_last_name( $a ), dlf_fellow_last_name( $b ) );
+}
+
+/**
+ * usort comparator: first name A->Z, then last name A->Z as a tiebreak. The
+ * default order for the fellows archive (both render paths).
+ */
+function dlf_compare_fellows_firstname( $a, $b )  {
+    $cmp = strcasecmp( dlf_fellow_first_name( $a ), dlf_fellow_first_name( $b ) );
+    return $cmp !== 0 ? $cmp : strcasecmp( dlf_fellow_last_name( $a ), dlf_fellow_last_name( $b ) );
 }
 
 function dlf_render_fellow_card_grid( $query_or_posts ) {
