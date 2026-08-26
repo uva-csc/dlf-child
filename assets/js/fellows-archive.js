@@ -89,6 +89,15 @@
 		return parts.length ? parts[ parts.length - 1 ] : n;
 	}
 
+	function firstName( name ) {
+		var n = ( name || '' )
+			.replace( /\s*\([^)]*\)/g, '' )   // drop "(...)" parentheticals
+			.replace( /["'‘’“”]/g, '' ) // drop quotes
+			.trim();
+		var parts = n.split( /\s+/ );
+		return parts.length ? parts[ 0 ] : n;
+	}
+
 	// Two-level sort. Whichever field is chosen is primary; the other is the
 	// tiebreak. Year is always newest-first (descending, matching the live
 	// site); last name is always A->Z.
@@ -98,9 +107,15 @@
 			var yb = parseInt( b.year, 10 ) || 0;
 			var byYear = yb - ya; // newest first
 			var byName = lastName( a.name ).localeCompare( lastName( b.name ) );
-			return mode === 'lastname'
-				? ( byName || byYear )
-				: ( byYear || byName );
+			var byFirstName = firstName( a.name ).localeCompare( firstName( b.name ) );
+			switch ( mode ) {
+				case 'year':
+					return byYear || byName;
+				case 'lastname':
+					return byName || byYear;
+				default:
+					return byFirstName || byName;
+			}
 		} );
 	}
 
@@ -122,7 +137,7 @@
 			return true;
 		} );
 
-		render( sortList( filtered, sortSelect ? sortSelect.value : 'year' ) );
+		render( sortList( filtered, sortSelect ? sortSelect.value : 'firstname' ) );
 	}
 
 	function openModal( fellow ) {
