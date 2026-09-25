@@ -55,8 +55,8 @@ get_header();
 		<div class="dlf-facet">
 			<label for="dlf-facet-sort">Sort by</label>
 			<select id="dlf-facet-sort" data-facet="sort">
-				<option value="year">Class</option>
-                <option value="firstname" selected>First name</option>
+				<option value="year" selected>Class</option>
+                <option value="firstname">First name</option>
 				<option value="lastname">Last name</option>
 			</select>
 		</div>

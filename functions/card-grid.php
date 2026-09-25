@@ -53,8 +53,7 @@ function dlf_fellow_year( $post ) {
 
 /**
  * usort comparator: year newest-first, then last name A->Z. Used for the
- * "Class" sort option; no longer the fellows archive default (see
- * dlf_compare_fellows_firstname()).
+ * "Class" sort option.
  */
 function dlf_compare_fellows_year_then_name( $a, $b ) {
 	$ya = dlf_fellow_year( $a );
@@ -66,8 +65,7 @@ function dlf_compare_fellows_year_then_name( $a, $b ) {
 }
 
 /**
- * usort comparator: first name A->Z, then last name A->Z as a tiebreak. The
- * default order for the fellows archive (both render paths).
+ * usort comparator: first name A->Z, then last name A->Z as a tiebreak.
  */
 function dlf_compare_fellows_firstname( $a, $b )  {
     $cmp = strcasecmp( dlf_fellow_first_name( $a ), dlf_fellow_first_name( $b ) );

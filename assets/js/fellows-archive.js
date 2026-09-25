@@ -137,7 +137,7 @@
 			return true;
 		} );
 
-		render( sortList( filtered, sortSelect ? sortSelect.value : 'firstname' ) );
+		render( sortList( filtered, sortSelect ? sortSelect.value : 'year' ) );
 	}
 
 	function openModal( fellow ) {
