@@ -100,7 +100,7 @@
 
 	// Two-level sort. Whichever field is chosen is primary; the other is the
 	// tiebreak. Year is always newest-first (descending, matching the live
-	// site); last name is always A->Z.
+	// site); names are always A->Z. "Class" tiebreaks on first name.
 	function sortList( list, mode ) {
 		return list.slice().sort( function ( a, b ) {
 			var ya = parseInt( a.year, 10 ) || 0;
@@ -110,7 +110,7 @@
 			var byFirstName = firstName( a.name ).localeCompare( firstName( b.name ) );
 			switch ( mode ) {
 				case 'year':
-					return byYear || byName;
+					return byYear || byFirstName;
 				case 'lastname':
 					return byName || byYear;
 				default:

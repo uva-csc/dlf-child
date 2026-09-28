@@ -69,12 +69,12 @@ get_header();
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
 		) );
-		// No-JS baseline sort: first name (A->Z), then last name as a
-		// tiebreak -- matches the default of the JS-enhanced view
-		// (fellows-archive.js). WP_Query can't order by a derived "first
-		// name", so sort the loaded posts.
+		// No-JS baseline sort: class (year, newest first), then first name
+		// A->Z -- matches the default of the JS-enhanced view
+		// (fellows-archive.js). WP_Query can't order by a derived name, so
+		// sort the loaded posts.
 		$sorted = $fellow_query->posts;
-		usort( $sorted, 'dlf_compare_fellows_firstname' );
+		usort( $sorted, 'dlf_compare_fellows_year_then_first_name' );
 		dlf_render_fellow_card_grid( $sorted );
 		wp_reset_postdata();
 		?>
