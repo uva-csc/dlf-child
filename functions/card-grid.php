@@ -52,22 +52,20 @@ function dlf_fellow_year( $post ) {
 }
 
 /**
- * usort comparator: year newest-first, then last name A->Z. Used for the
- * "Class" sort option; no longer the fellows archive default (see
- * dlf_compare_fellows_firstname()).
+ * usort comparator: year newest-first, then first name A->Z. Used for the
+ * "Class" sort option.
  */
-function dlf_compare_fellows_year_then_name( $a, $b ) {
+function dlf_compare_fellows_year_then_first_name( $a, $b ) {
 	$ya = dlf_fellow_year( $a );
 	$yb = dlf_fellow_year( $b );
 	if ( $ya !== $yb ) {
 		return $yb <=> $ya; // newest first
 	}
-	return strcasecmp( dlf_fellow_last_name( $a ), dlf_fellow_last_name( $b ) );
+	return strcasecmp( dlf_fellow_first_name( $a ), dlf_fellow_first_name( $b ) );
 }
 
 /**
- * usort comparator: first name A->Z, then last name A->Z as a tiebreak. The
- * default order for the fellows archive (both render paths).
+ * usort comparator: first name A->Z, then last name A->Z as a tiebreak.
  */
 function dlf_compare_fellows_firstname( $a, $b )  {
     $cmp = strcasecmp( dlf_fellow_first_name( $a ), dlf_fellow_first_name( $b ) );

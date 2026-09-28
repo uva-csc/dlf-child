@@ -209,7 +209,6 @@ img {
 .dlf-footer-col strong {
 	display: block;
 	font-family: var(--dlf-font-body);
-	font-size: 1rem;
 	font-weight: 700;
 	color: var(--dlf-heading-color);
 	margin-bottom: 0.75rem;
@@ -226,7 +225,6 @@ img {
 }
 
 .dlf-footer-col a {
-	font-size: 1rem;
 	text-decoration: underline;
 	color: var(--dlf-text);
 }
